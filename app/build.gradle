@@ -44,7 +44,7 @@ dependencies {
 //    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
 //    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    implementation 'com.github.aakumykov:panorama_gl_library:0.0.1'
+    implementation 'com.github.aakumykov:panorama_gl_library:0.0.2'
     implementation 'com.github.aakumykov:file_dir_helper:0.0.6'
     implementation 'com.github.aakumykov:exception_utils:0.4'
 
