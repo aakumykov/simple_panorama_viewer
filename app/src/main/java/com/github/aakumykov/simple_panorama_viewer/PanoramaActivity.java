@@ -184,7 +184,7 @@ public class PanoramaActivity extends AppCompatActivity {
     private void preparePanoramaManager() {
         mPLManager = new PLManager(this);
         mPLManager.setContentView(mBinding.panoramaView);
-//        mPLManager.setAcceleratedTouchScrollingEnabled(true);
+        mPLManager.setAcceleratedTouchScrollingEnabled(true);
         mPLManager.onCreate();
     }
 
