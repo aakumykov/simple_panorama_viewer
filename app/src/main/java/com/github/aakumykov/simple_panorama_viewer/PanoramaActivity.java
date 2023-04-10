@@ -1,8 +1,14 @@
 package com.github.aakumykov.simple_panorama_viewer;
 
+import static android.hardware.SensorManager.SENSOR_DELAY_NORMAL;
+
 import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -20,6 +26,7 @@ import com.panoramagl.PLICamera;
 import com.panoramagl.PLImage;
 import com.panoramagl.PLManager;
 import com.panoramagl.PLSphericalPanorama;
+import com.panoramagl.ios.structs.UIAcceleration;
 import com.panoramagl.utils.PLUtils;
 
 import java.io.File;
@@ -32,11 +39,15 @@ import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
 @RuntimePermissions
-public class PanoramaActivity extends AppCompatActivity {
+public class PanoramaActivity extends AppCompatActivity implements SensorEventListener {
 
     private static final String TAG = PanoramaActivity.class.getSimpleName();
     private ActivityPanoramaBinding mBinding;
     private PLManager mPLManager;
+    private SensorManager mSensorManager;
+    private Sensor mSensorAccel;
+    private final float[] mValuesAccel = new float[3];
+    private final UIAcceleration mUIAcceleration = new UIAcceleration();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +62,13 @@ public class PanoramaActivity extends AppCompatActivity {
                 exitApp();
             }
         });
+
+        prepareSensors();
+    }
+
+    private void prepareSensors() {
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensorAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     @Override
@@ -82,15 +100,23 @@ public class PanoramaActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         if (null != mPLManager)
             mPLManager.onResume();
+
+        if (null != mSensorManager)
+            mSensorManager.registerListener(this, mSensorAccel, SENSOR_DELAY_NORMAL);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
         if (null != mPLManager)
             mPLManager.onPause();
+
+        if (null != mSensorManager)
+            mSensorManager.unregisterListener(this);
     }
 
     @Override
@@ -184,7 +210,13 @@ public class PanoramaActivity extends AppCompatActivity {
     private void preparePanoramaManager() {
         mPLManager = new PLManager(this);
         mPLManager.setContentView(mBinding.panoramaView);
-//        mPLManager.setAcceleratedTouchScrollingEnabled(true);
+
+        mPLManager.setAcceleratedTouchScrollingEnabled(true);
+
+        mPLManager.setAccelerometerEnabled(true);
+        mPLManager.setAccelerometerUpDownEnabled(true);
+        mPLManager.setAccelerometerLeftRightEnabled(true);
+
         mPLManager.onCreate();
     }
 
@@ -249,5 +281,24 @@ public class PanoramaActivity extends AppCompatActivity {
 
     private void nothingToShowError() {
         displayError(new Exception(getString(R.string.error_nothing_to_display)));
+    }
+
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (Sensor.TYPE_ACCELEROMETER == event.sensor.getType()) {
+            System.arraycopy(event.values, 0, mValuesAccel, 0, 3);
+            movePanorama(event);
+        }
+    }
+
+    private void movePanorama(@NonNull SensorEvent event) {
+        mUIAcceleration.setValues(mValuesAccel);
+        mPLManager.accelerometer(event, mUIAcceleration);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
