@@ -1,9 +1,13 @@
 package com.github.aakumykov.simple_panorama_viewer;
 
 import android.Manifest;
+import android.content.ClipData;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -12,12 +16,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.aakumykov.simple_panorama_viewer.databinding.ActivityPanoramaBinding;
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils;
+import com.panoramagl.PLICamera;
 import com.panoramagl.PLImage;
 import com.panoramagl.PLManager;
 import com.panoramagl.PLSphericalPanorama;
 import com.panoramagl.utils.PLUtils;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -60,6 +66,14 @@ public class PanoramaActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (null != mPLManager)
+            return mPLManager.onTouchEvent(event);
+        else
+            return super.onTouchEvent(event);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         PanoramaActivityPermissionsDispatcher.processInputIntentWithPermissionCheck(this);
@@ -89,15 +103,47 @@ public class PanoramaActivity extends AppCompatActivity {
 
     @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     void processInputIntent() {
-        try {
-            Uri uri = IntentUriExtractor.getUriFromIntent(getIntent());
-            displayPanorama(uri);
+
+        final Intent intent = getIntent();
+        final ClipData clipData = intent.getClipData();
+
+        if (null == clipData) {
+            nothingToShowError();
+            return;
         }
-        catch (IntentUriExtractor.NoUriInIntentException e) {
-            displayError(new Exception(getString(R.string.error_nothing_to_display)));
+
+        if (0 == clipData.getItemCount()) {
+            nothingToShowError();
+            return;
         }
-        catch (IntentUriExtractor.IntentUriExtractorException e) {
-            displayError(e);
+
+        final Uri dataUri = /*intent.getData()*/
+        intent.getClipData().getItemAt(0).getUri();
+
+        if (null == dataUri) {
+            nothingToShowError();
+            return;
+        }
+
+        try (ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(dataUri, "r")) {
+            final FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+
+            final byte[] bytesArray;
+            try (FileInputStream fileInputStream = new FileInputStream(fileDescriptor)) {
+                bytesArray = new byte[fileInputStream.available()];
+                fileInputStream.read(bytesArray);
+
+                preparePanoramaManager();
+                hideToolbar();
+                showPanoramicImage(bytesArray);
+                showView(mBinding.panoramaView);
+            }
+        }
+        catch (FileNotFoundException e) {
+            displayError(new Exception(getString(R.string.error_file_not_found, dataUri.toString())));
+        }
+        catch (IOException e) {
+            displayError(new Exception(getString(R.string.error_reading_file, dataUri.toString())));
         }
     }
 
@@ -127,6 +173,11 @@ public class PanoramaActivity extends AppCompatActivity {
     private void showPanoramicImage(byte[] bytes) {
         PLSphericalPanorama panorama = new PLSphericalPanorama();
         panorama.setImage(new PLImage(PLUtils.getBitmap(bytes), false));
+
+        final PLICamera pliCamera = panorama.getCamera();
+        pliCamera.setZoomFactor(2f);
+        pliCamera.zoomIn(true);
+
         mPLManager.setPanorama(panorama);
     }
 
@@ -193,5 +244,9 @@ public class PanoramaActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (null != actionBar)
             actionBar.hide();
+    }
+
+    private void nothingToShowError() {
+        displayError(new Exception(getString(R.string.error_nothing_to_display)));
     }
 }
