@@ -3,6 +3,10 @@ package com.github.aakumykov.simple_panorama_viewer;
 import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -11,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,11 +37,13 @@ import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
 @RuntimePermissions
-public class PanoramaActivity extends AppCompatActivity {
+public class PanoramaActivity extends AppCompatActivity implements SensorEventListener {
 
     private static final String TAG = PanoramaActivity.class.getSimpleName();
     private ActivityPanoramaBinding mBinding;
     private PLManager mPLManager;
+    @Nullable private PLICamera mPliCamera;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +58,12 @@ public class PanoramaActivity extends AppCompatActivity {
                 exitApp();
             }
         });
+
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mRotationVectorSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -82,15 +94,21 @@ public class PanoramaActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         if (null != mPLManager)
             mPLManager.onResume();
+
+        mSensorManager.registerListener(this, mRotationVectorSensor, ROTATION_SENSOR_SAMPLING_DELAY);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
         if (null != mPLManager)
             mPLManager.onPause();
+
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
@@ -174,9 +192,9 @@ public class PanoramaActivity extends AppCompatActivity {
         PLSphericalPanorama panorama = new PLSphericalPanorama();
         panorama.setImage(new PLImage(PLUtils.getBitmap(bytes), false));
 
-        final PLICamera pliCamera = panorama.getCamera();
-        pliCamera.setZoomFactor(2f);
-        pliCamera.zoomIn(true);
+        mPliCamera = panorama.getCamera();
+        mPliCamera.setZoomFactor(2f);
+        mPliCamera.zoomIn(true);
 
         mPLManager.setPanorama(panorama);
     }
@@ -249,5 +267,36 @@ public class PanoramaActivity extends AppCompatActivity {
 
     private void nothingToShowError() {
         displayError(new Exception(getString(R.string.error_nothing_to_display)));
+    }
+
+
+
+    private SensorManager mSensorManager;
+    private Sensor mRotationVectorSensor;
+    private final float[] mRotationMatrix = new float[16];
+    private final float[] mOrientation = new float[3];
+    private static final int ROTATION_SENSOR_SAMPLING_DELAY = 1000000000;
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (null == mPliCamera)
+            return;
+
+        SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
+
+        // Y,P,R
+        SensorManager.getOrientation(mRotationMatrix, mOrientation);
+        final float yaw = mOrientation[0];
+        final float pitch = mOrientation[1];
+        final float roll = mOrientation[2];
+        Log.d("ORIENTATION", "YPR: "+yaw+", "+pitch+", "+roll);
+
+        // P,Y,R
+//        mPliCamera.setRotation(mOrientation[1], mOrientation[0], mOrientation[2]);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
