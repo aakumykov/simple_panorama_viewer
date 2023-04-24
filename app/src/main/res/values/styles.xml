@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="rotation_arrow">
+        <item name="android:padding">16dp</item>
+        <item name="android:background">#61FFFFFF</item>
+    </style>
+
+    <style name="rotation_view">
+        <item name="android:background">#61FFFFFF</item>
+    </style>
+</resources>

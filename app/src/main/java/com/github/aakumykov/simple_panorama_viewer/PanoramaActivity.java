@@ -24,9 +24,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.github.aakumykov.simple_panorama_viewer.databinding.ActivityPanoramaBinding;
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils;
 import com.panoramagl.PLICamera;
+import com.panoramagl.PLIView;
 import com.panoramagl.PLImage;
 import com.panoramagl.PLManager;
 import com.panoramagl.PLSphericalPanorama;
+import com.panoramagl.PLViewListener;
+import com.panoramagl.structs.PLRotation;
 import com.panoramagl.utils.PLUtils;
 
 import java.io.File;
@@ -44,7 +47,7 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
     private static final String TAG = PanoramaActivity.class.getSimpleName();
     private ActivityPanoramaBinding mBinding;
     private PLManager mPLManager;
-    @Nullable private PLICamera mPliCamera;
+    @Nullable private PLICamera mCamera;
 
 
     @Override
@@ -61,10 +64,45 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
             }
         });
 
+        mBinding.leftArrow.setOnClickListener(this::onRotateLeftClicked);
+        mBinding.rightArrow.setOnClickListener(this::onRotateRightClicked);
+
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mRotationVectorSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
     }
 
+    private void onRotateRightClicked(View view) {
+        if (null != mCamera) {
+            final PLRotation currentRotation = mCamera.getRotation();
+
+//            Toast.makeText(this, String.valueOf(currentRotation.yaw), Toast.LENGTH_SHORT).show();
+
+            final PLRotation newRotation = new PLRotation();
+
+            newRotation.pitch = 0f;
+            newRotation.yaw = currentRotation.yaw + 10f;
+            newRotation.roll = 0f;
+
+            mCamera.rotate(newRotation);
+            displayRotation(mCamera.getRotation());
+        }
+    }
+
+    private void onRotateLeftClicked(View view) {
+        if (null != mCamera) {
+            final PLRotation currentRotation = mCamera.getRotation();
+
+//            Toast.makeText(this, String.valueOf(currentRotation.yaw), Toast.LENGTH_SHORT).show();
+
+            final PLRotation newRotation = new PLRotation();
+            newRotation.pitch = 0f;
+            newRotation.yaw = currentRotation.yaw - 10f;
+            newRotation.roll = 0f;
+
+            mCamera.rotate(newRotation);
+            displayRotation(mCamera.getRotation());
+        }
+    }
 
 
     @Override
@@ -194,11 +232,13 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
         PLSphericalPanorama panorama = new PLSphericalPanorama();
         panorama.setImage(new PLImage(PLUtils.getBitmap(bytes), false));
 
-        mPliCamera = panorama.getCamera();
-        mPliCamera.setZoomFactor(2f);
-        mPliCamera.zoomIn(true);
+        mCamera = panorama.getCamera();
+        mCamera.setZoomFactor(2f);
+        mCamera.zoomIn(true);
 
         mPLManager.setPanorama(panorama);
+
+        displayRotation(mCamera.getRotation());
     }
 
     private void preparePanoramaManager() {
@@ -206,6 +246,7 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
         mPLManager.setContentView(mBinding.panoramaView);
         mPLManager.setAcceleratedTouchScrollingEnabled(true);
         mPLManager.onCreate();
+        mPLManager.setListener(new PanoramaViewListener());
     }
 
 
@@ -285,7 +326,7 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
         if (event.sensor.getType() != Sensor.TYPE_ROTATION_VECTOR)
             return;
 
-        if (null == mPliCamera)
+        if (null == mCamera)
             return;
 
         SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
@@ -309,5 +350,25 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    private class PanoramaViewListener extends PLViewListener {
+        @Override
+        public void onDidRotateCamera(@Nullable PLIView view, @Nullable Object sender,
+                                      @Nullable PLICamera camera, float pitch, float yaw, float roll) {
+            super.onDidRotateCamera(view, sender, camera, pitch, yaw, roll);
+            displayRotation(pitch, yaw, roll);
+        }
+    }
+
+
+    private void displayRotation(PLRotation plRotation) {
+        displayRotation(plRotation.pitch, plRotation.yaw, plRotation.roll);
+    }
+
+    private void displayRotation(float pitch, float yaw, float roll) {
+        mBinding.pitchView.setText(String.valueOf(pitch));
+        mBinding.yawView.setText(String.valueOf(yaw));
+        mBinding.rollView.setText(String.valueOf(roll));
     }
 }

@@ -58,4 +58,54 @@
         app:constraint_referenced_ids="errorMessageView,errorActionButton"
         tools:visibility="visible" />
 
+    <ImageView
+        android:id="@+id/leftArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        style="@style/rotation_arrow"
+        app:srcCompat="@drawable/ic_arrow_left" />
+
+    <ImageView
+        android:id="@+id/rightArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        style="@style/rotation_arrow"
+        app:srcCompat="@drawable/ic_arow_right" />
+
+    <TextView
+        android:id="@+id/pitchView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/yawView"
+        style="@style/rotation_view"
+        android:text="тангаж" />
+
+    <TextView
+        android:id="@+id/yawView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/rollView"
+        app:layout_constraintStart_toEndOf="@id/pitchView"
+        style="@style/rotation_view"
+        android:text="рыскание" />
+
+    <TextView
+        android:id="@+id/rollView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/yawView"
+        style="@style/rotation_view"
+        android:text="вращение" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
