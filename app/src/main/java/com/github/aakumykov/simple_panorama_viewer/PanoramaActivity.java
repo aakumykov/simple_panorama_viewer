@@ -1,5 +1,7 @@
 package com.github.aakumykov.simple_panorama_viewer;
 
+import static java.lang.Float.isNaN;
+
 import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
@@ -98,7 +100,7 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
         if (null != mPLManager)
             mPLManager.onResume();
 
-        mSensorManager.registerListener(this, mRotationVectorSensor, ROTATION_SENSOR_SAMPLING_DELAY);
+//        mSensorManager.registerListener(this, mRotationVectorSensor, ROTATION_SENSOR_SAMPLING_DELAY);
     }
 
     @Override
@@ -108,7 +110,7 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
         if (null != mPLManager)
             mPLManager.onPause();
 
-        mSensorManager.unregisterListener(this);
+//        mSensorManager.unregisterListener(this);
     }
 
     @Override
@@ -279,6 +281,10 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+
+        if (event.sensor.getType() != Sensor.TYPE_ROTATION_VECTOR)
+            return;
+
         if (null == mPliCamera)
             return;
 
@@ -286,9 +292,14 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
 
         // Y,P,R
         SensorManager.getOrientation(mRotationMatrix, mOrientation);
+
         final float yaw = mOrientation[0];
         final float pitch = mOrientation[1];
         final float roll = mOrientation[2];
+
+        if (isNaN(yaw) || isNaN(pitch) || isNaN(roll))
+            return;
+
         Log.d("ORIENTATION", "YPR: "+yaw+", "+pitch+", "+roll);
 
         // P,Y,R
