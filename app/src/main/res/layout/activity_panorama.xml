@@ -58,4 +58,40 @@
         app:constraint_referenced_ids="errorMessageView,errorActionButton"
         tools:visibility="visible" />
 
+    <ImageView
+        android:id="@+id/leftArrow"
+        style="@style/pano_view_arrows"
+        android:layout_marginStart="@dimen/pano_view_arrow_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_arrow_left" />
+
+    <ImageView
+        android:id="@+id/topArrow"
+        style="@style/pano_view_arrows"
+        android:layout_marginTop="@dimen/pano_view_arrow_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_arrow_up" />
+
+    <ImageView
+        android:id="@+id/rightArrow"
+        style="@style/pano_view_arrows"
+        android:layout_marginEnd="@dimen/pano_view_arrow_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_arrow_right" />
+
+    <ImageView
+        android:id="@+id/bottomArrow"
+        style="@style/pano_view_arrows"
+        android:layout_marginBottom="@dimen/pano_view_arrow_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_arrow_down" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

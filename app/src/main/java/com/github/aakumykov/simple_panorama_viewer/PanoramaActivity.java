@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,6 +21,7 @@ import com.panoramagl.PLICamera;
 import com.panoramagl.PLImage;
 import com.panoramagl.PLManager;
 import com.panoramagl.PLSphericalPanorama;
+import com.panoramagl.structs.PLRotation;
 import com.panoramagl.utils.PLUtils;
 
 import java.io.File;
@@ -37,6 +39,7 @@ public class PanoramaActivity extends AppCompatActivity {
     private static final String TAG = PanoramaActivity.class.getSimpleName();
     private ActivityPanoramaBinding mBinding;
     private PLManager mPLManager;
+    private final ViewCamera mViewPort = new ViewCamera();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,27 @@ public class PanoramaActivity extends AppCompatActivity {
                 exitApp();
             }
         });
+
+        mBinding.leftArrow.setOnClickListener(v -> rotatePanoramaLeft());
+        mBinding.topArrow.setOnClickListener(v -> rotatePanoramaTop());
+        mBinding.rightArrow.setOnClickListener(v -> rotatePanoramaRight());
+        mBinding.bottomArrow.setOnClickListener(v -> rotatePanoramaBottom());
+    }
+
+    private void rotatePanoramaLeft() {
+        mViewPort.rotateLeft(10);
+    }
+
+    private void rotatePanoramaRight() {
+        mViewPort.rotateRight(10);
+    }
+
+    private void rotatePanoramaTop() {
+        mViewPort.rotateTop(10);
+    }
+
+    private void rotatePanoramaBottom() {
+        mViewPort.rotateBottom(10);
     }
 
     @Override
@@ -174,9 +198,9 @@ public class PanoramaActivity extends AppCompatActivity {
         PLSphericalPanorama panorama = new PLSphericalPanorama();
         panorama.setImage(new PLImage(PLUtils.getBitmap(bytes), false));
 
-        final PLICamera pliCamera = panorama.getCamera();
-        pliCamera.setZoomFactor(2f);
-        pliCamera.zoomIn(true);
+        PLICamera camera = panorama.getCamera();
+        camera.setZoomFactor(2f);
+        camera.zoomIn(true);
 
         mPLManager.setPanorama(panorama);
     }
@@ -249,5 +273,55 @@ public class PanoramaActivity extends AppCompatActivity {
 
     private void nothingToShowError() {
         displayError(new Exception(getString(R.string.error_nothing_to_display)));
+    }
+
+
+    private class ViewCamera {
+
+        PLICamera mCamera;
+
+        public void rotateLeft(int degrees) {
+            if (null == camera())
+                return;
+
+            PLRotation rotation = mCamera.getRotation();
+            rotation.yaw -= degrees;
+            mCamera.setRotation(rotation);
+        }
+
+        public void rotateRight(int degrees) {
+            if (null == camera())
+                return;
+
+            PLRotation rotation = mCamera.getRotation();
+            rotation.yaw += degrees;
+            mCamera.setRotation(rotation);
+        }
+
+        public void rotateBottom(int degrees) {
+            if (null == camera())
+                return;
+
+            PLRotation rotation = mCamera.getRotation();
+            rotation.pitch -= degrees;
+            mCamera.setRotation(rotation);
+        }
+
+        public void rotateTop(int degrees) {
+            if (null == camera())
+                return;
+
+            PLRotation rotation = mCamera.getRotation();
+            rotation.pitch += degrees;
+            mCamera.setRotation(rotation);
+        }
+
+        @Nullable
+        private PLICamera camera() {
+            if (null == mPLManager)
+                return null;
+            mCamera = mPLManager.getCamera();
+            return mCamera;
+        }
     }
 }

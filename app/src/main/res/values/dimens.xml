@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="pano_view_arrow_size">48dp</dimen>
+    <dimen name="pano_view_arrow_corner_radius">12dp</dimen>
+    <dimen name="pano_view_arrow_margin">4dp</dimen>
+</resources>
