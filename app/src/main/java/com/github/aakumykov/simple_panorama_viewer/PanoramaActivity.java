@@ -138,7 +138,7 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
         if (null != mPLManager)
             mPLManager.onResume();
 
-//        mSensorManager.registerListener(this, mRotationVectorSensor, ROTATION_SENSOR_SAMPLING_DELAY);
+        mSensorManager.registerListener(this, mRotationVectorSensor, ROTATION_SENSOR_SAMPLING_DELAY);
     }
 
     @Override
@@ -148,7 +148,7 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
         if (null != mPLManager)
             mPLManager.onPause();
 
-//        mSensorManager.unregisterListener(this);
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
@@ -323,34 +323,47 @@ public class PanoramaActivity extends AppCompatActivity implements SensorEventLi
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if (event.sensor.getType() != Sensor.TYPE_ROTATION_VECTOR)
-            return;
+        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
+            SensorManager.getOrientation(mRotationMatrix, mOrientation);
 
-        if (null == mCamera)
-            return;
+            final float yaw = mOrientation[0];
+            final float pitch = mOrientation[1];
+            final float roll = mOrientation[2];
 
-        SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
+            if (isNaN(yaw) || isNaN(pitch) || isNaN(roll))
+                return;
 
-        // Y,P,R
-        SensorManager.getOrientation(mRotationMatrix, mOrientation);
+//            displayOrientationAsRadians(yaw, pitch, roll);
+//            displayOrientationAsDegrees(yaw, pitch, roll);
 
-        final float yaw = mOrientation[0];
-        final float pitch = mOrientation[1];
-        final float roll = mOrientation[2];
+            double p = rad2deg(pitch);
+            double y = rad2deg(yaw);
+            double r = rad2deg(roll);
 
-        if (isNaN(yaw) || isNaN(pitch) || isNaN(roll))
-            return;
+            Log.d("ORIENTATION", "p:"+p+", y:"+y+", r:"+r);
 
-        Log.d("ORIENTATION", "YPR: "+yaw+", "+pitch+", "+roll);
+            final PLRotation rotation = new PLRotation(0f, (float) y, 0f);
 
-        // P,Y,R
-//        mPliCamera.setRotation(mOrientation[1], mOrientation[0], mOrientation[2]);
+//            if (null != mCamera)
+//                mCamera.setRotation(rotation);
+        }
+    }
+
+    private double rad2deg(float radiansValue) {
+        return rad2deg(radiansValue, true);
+    }
+
+    private double rad2deg(float valueInRadians, boolean roundResult) {
+        final double res = 180 * (valueInRadians / Math.PI);
+        return (roundResult) ? Math.round(res) : res;
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
 
     private class PanoramaViewListener extends PLViewListener {
         @Override
