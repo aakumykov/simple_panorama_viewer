@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -97,13 +99,16 @@ public class PanoramaActivity extends AppCompatActivity {
             return super.onTouchEvent(event);
     }
 
+    /**
+     * Смотри метод {@link #processInputIntent() getComponentAt} method.
+     */
     @Override
     protected void onStart() {
         super.onStart();
-        /**
-         * Смотри метод {@link #processInputIntent() getComponentAt} method.
-         */
-        PanoramaActivityPermissionsDispatcher.processInputIntentWithPermissionCheck(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            PanoramaActivityPermissionsDispatcher.processInputIntentNewWithPermissionCheck(this);
+        else
+            PanoramaActivityPermissionsDispatcher.processInputIntentOldWithPermissionCheck(this);
     }
 
     @Override
@@ -130,9 +135,18 @@ public class PanoramaActivity extends AppCompatActivity {
     /**
      * Вызывается в методе {@link #onStart()} через вспомогательный класс.
      */
-    @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-    void processInputIntent() {
+    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE})
+    void processInputIntentOld() {
+        processInputIntent();
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    @NeedsPermission({Manifest.permission.READ_MEDIA_IMAGES})
+    void processInputIntentNew() {
+        processInputIntent();
+    }
+
+    private void processInputIntent() {
         final Intent intent = getIntent();
         final ClipData clipData = intent.getClipData();
 
@@ -147,7 +161,7 @@ public class PanoramaActivity extends AppCompatActivity {
         }
 
         final Uri dataUri = /*intent.getData()*/
-        intent.getClipData().getItemAt(0).getUri();
+                intent.getClipData().getItemAt(0).getUri();
 
         if (null == dataUri) {
             nothingToShowError();
@@ -175,6 +189,7 @@ public class PanoramaActivity extends AppCompatActivity {
             displayError(new Exception(getString(R.string.error_reading_file, dataUri.toString())));
         }
     }
+
 
     private void displayPanorama(@NonNull Uri imageUri) {
         preparePanoramaManager();
