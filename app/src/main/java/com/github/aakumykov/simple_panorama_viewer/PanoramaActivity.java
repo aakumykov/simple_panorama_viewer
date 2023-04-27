@@ -100,6 +100,9 @@ public class PanoramaActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        /**
+         * Смотри метод {@link #processInputIntent() getComponentAt} method.
+         */
         PanoramaActivityPermissionsDispatcher.processInputIntentWithPermissionCheck(this);
     }
 
@@ -124,7 +127,9 @@ public class PanoramaActivity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * Вызывается в методе {@link #onStart()} через вспомогательный класс.
+     */
     @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     void processInputIntent() {
 
