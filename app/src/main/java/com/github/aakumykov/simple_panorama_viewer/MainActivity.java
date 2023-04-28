@@ -5,8 +5,11 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.github.aakumykov.simple_panorama_viewer.databinding.ActivityMainBinding;
@@ -20,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding mBinding;
     private FragmentManager mFragmentManager;
+    @Nullable private IntentWrapper mIntentProcessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +33,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(mBinding.getRoot());
 
         mFragmentManager = getSupportFragmentManager();
-
-
 
         askForPermissions();
     }
@@ -65,29 +67,57 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @NeedsPermission({Manifest.permission.READ_MEDIA_IMAGES})
-    void askFileReadingNew() {}
+    void askFileReadingNew() {
+        processInputIntent();
+    }
 
     @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE})
-    void askFileReadingOld() {}
+    void askFileReadingOld() {
+        processInputIntent();
+    }
 
+    private void processInputIntent() {
+        IntentWrapper intentWrapper = new IntentWrapper(getIntent());
+        if (intentWrapper.hasData())
+            showPanoramaFragment(intentWrapper.getDataURI());
+        else
+            showFileSelectionFragment();
+    }
+
+    private void showPanoramaFragment(Object payload) {
+
+    }
+
+    private void showFileSelectionFragment() {
+        setFragment(FileSelectionFragment.create());
+    }
 
 
     @OnPermissionDenied({Manifest.permission.READ_EXTERNAL_STORAGE})
 //    @OnNeverAskAgain({Manifest.permission.READ_EXTERNAL_STORAGE})
     void showNoPermissionErrorOld() {
-        showNoPermissionFragment("Отсутствует разрешение READ_EXTERNAL_STORAGE");
+        showErrorFragment("Отсутствует разрешение READ_EXTERNAL_STORAGE");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @OnPermissionDenied({Manifest.permission.READ_MEDIA_IMAGES})
     void showNoPermissionErrorNew() {
-        showNoPermissionFragment("Отсутствует разрешение READ_MEDIA_IMAGES");
+        showErrorFragment("Отсутствует разрешение READ_MEDIA_IMAGES");
     }
 
-    private void showNoPermissionFragment(String errorMsg) {
+    private void showErrorFragment(@StringRes int errorMsgStringRes) {
+        showErrorFragment(getString(errorMsgStringRes));
+    }
+
+    private void showErrorFragment(String errorMsg) {
         mFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerView, ErrorFragment.create(errorMsg), null)
                 .commit();
     }
 
+    private void setFragment(Fragment fragment) {
+        mFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainerView, fragment, null)
+                .commit();
+    }
 }

@@ -6,4 +6,7 @@
     <string name="error_reading_file">Ошибка чтения файла:\n%1$s</string>
     <string name="ERROR_unknown">Неизвестная ошибка</string>
     <string name="ERROR_no_error_data">Отсутствуют сведения об ошибке</string>
+    <string name="ERROR_no_input_data">Нет входящих данных</string>
+    <string name="select_image_to_view">Нажмите, чтобы выбрать изображение</string>
+    <string name="description_image_selection_icon">Значок выбора изображения для просмотра</string>
 </resources>
