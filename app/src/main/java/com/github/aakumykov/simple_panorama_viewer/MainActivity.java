@@ -2,6 +2,7 @@ package com.github.aakumykov.simple_panorama_viewer;
 
 import android.Manifest;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -35,13 +36,13 @@ public class MainActivity extends AppCompatActivity {
 
         mFragmentManager = getSupportFragmentManager();
 
-        startToWork();
+        startToWork(getIntent());
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        startToWork();
+        startToWork(intent);
     }
 
     @Override
@@ -65,27 +66,28 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void startToWork() {
+    public void startToWork(@Nullable Intent intent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            MainActivityPermissionsDispatcher.askFileReadingNewWithPermissionCheck(this);
+            MainActivityPermissionsDispatcher.startToWorkNewWithPermissionCheck(this, intent);
         else
-            MainActivityPermissionsDispatcher.askFileReadingOldWithPermissionCheck(this);
+            MainActivityPermissionsDispatcher.startToWorkOldWithPermissionCheck(this, intent);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @NeedsPermission({Manifest.permission.READ_MEDIA_IMAGES})
-    void askFileReadingNew() {
-        processInputIntent();
+    void startToWorkNew(@Nullable Intent intent) {
+        processInputIntent(intent);
     }
 
     @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE})
-    void askFileReadingOld() {
-        processInputIntent();
+    void startToWorkOld(@Nullable Intent intent) {
+        processInputIntent(intent);
     }
 
-    private void processInputIntent() {
+    
+    private void processInputIntent(@Nullable Intent intent) {
 
-        IntentWrapper intentWrapper = new IntentWrapper(getIntent());
+        IntentWrapper intentWrapper = new IntentWrapper(intent);
 
         if (intentWrapper.hasError()) {
             showErrorFragment(intentWrapper.getError());
@@ -98,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
             showFileSelectionFragment();
     }
 
-    private void showPanoramaFragment(Object payload) {
-
+    private void showPanoramaFragment(Uri fileURI) {
+        setFragment(PanoramaFragment.create(fileURI));
     }
 
     private void showFileSelectionFragment() {

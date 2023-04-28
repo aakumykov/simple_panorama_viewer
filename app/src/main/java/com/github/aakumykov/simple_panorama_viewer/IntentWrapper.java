@@ -40,6 +40,7 @@ class IntentWrapper {
 
 
     private void processDataFromIntent() {
+
         if (null == mIntent) {
             setError("Intent is null");
             return;

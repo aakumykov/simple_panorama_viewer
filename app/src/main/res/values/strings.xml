@@ -9,4 +9,5 @@
     <string name="ERROR_no_input_data">Нет входящих данных</string>
     <string name="select_image_to_view">Нажмите, чтобы выбрать изображение</string>
     <string name="description_image_selection_icon">Значок выбора изображения для просмотра</string>
+    <string name="ERROR_no_data_readed_from_file">Нет данных, прочитанных из файла</string>
 </resources>
