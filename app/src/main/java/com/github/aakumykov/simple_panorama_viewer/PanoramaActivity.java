@@ -17,7 +17,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.github.aakumykov.simple_panorama_viewer.databinding.ActivityPanoramaBinding;
+import com.github.aakumykov.simple_panorama_viewer.databinding.ActivityMainBinding;
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils;
 import com.panoramagl.PLICamera;
 import com.panoramagl.PLImage;
@@ -39,7 +39,7 @@ import permissions.dispatcher.RuntimePermissions;
 public class PanoramaActivity extends AppCompatActivity {
 
     private static final String TAG = PanoramaActivity.class.getSimpleName();
-    private ActivityPanoramaBinding mBinding;
+    private ActivityMainBinding mBinding;
     private PLManager mPLManager;
     private final ViewCamera mViewPort = new ViewCamera();
 
@@ -47,7 +47,7 @@ public class PanoramaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mBinding = ActivityPanoramaBinding.inflate(getLayoutInflater());
+        mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
 
         mBinding.errorActionButton.setOnClickListener(new View.OnClickListener() {
