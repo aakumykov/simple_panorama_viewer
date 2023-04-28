@@ -1,6 +1,7 @@
 package com.github.aakumykov.simple_panorama_viewer;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -34,7 +35,13 @@ public class MainActivity extends AppCompatActivity {
 
         mFragmentManager = getSupportFragmentManager();
 
-        askForPermissions();
+        startToWork();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        startToWork();
     }
 
     @Override
@@ -58,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void askForPermissions() {
+    public void startToWork() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             MainActivityPermissionsDispatcher.askFileReadingNewWithPermissionCheck(this);
         else
@@ -77,7 +84,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void processInputIntent() {
+
         IntentWrapper intentWrapper = new IntentWrapper(getIntent());
+
+        if (intentWrapper.hasError()) {
+            showErrorFragment(intentWrapper.getError());
+            return;
+        }
+
         if (intentWrapper.hasData())
             showPanoramaFragment(intentWrapper.getDataURI());
         else

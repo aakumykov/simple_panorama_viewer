@@ -62,4 +62,8 @@ class IntentWrapper {
             return;
         }
     }
+
+    public boolean hasError() {
+        return null != mErrorMsg;
+    }
 }
