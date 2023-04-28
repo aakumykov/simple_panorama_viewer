@@ -1,44 +1,10 @@
 package com.github.aakumykov.simple_panorama_viewer;
 
-import android.Manifest;
-import android.content.ClipData;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.github.aakumykov.simple_panorama_viewer.databinding.ActivityMainBinding;
-import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils;
-import com.panoramagl.PLICamera;
-import com.panoramagl.PLImage;
-import com.panoramagl.PLManager;
-import com.panoramagl.PLSphericalPanorama;
-import com.panoramagl.structs.PLRotation;
-import com.panoramagl.utils.PLUtils;
-
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.RuntimePermissions;
-
-@RuntimePermissions
 public class PanoramaActivity extends AppCompatActivity {
 
-    private static final String TAG = PanoramaActivity.class.getSimpleName();
+    /*private static final String TAG = PanoramaActivity.class.getSimpleName();
     private ActivityMainBinding mBinding;
     private PLManager mPLManager;
     private final ViewCamera mViewPort = new ViewCamera();
@@ -99,9 +65,9 @@ public class PanoramaActivity extends AppCompatActivity {
             return super.onTouchEvent(event);
     }
 
-    /**
+    *//**
      * Смотри метод {@link #processInputIntent() getComponentAt} method.
-     */
+     *//*
     @Override
     protected void onStart() {
         super.onStart();
@@ -132,9 +98,9 @@ public class PanoramaActivity extends AppCompatActivity {
     }
 
 
-    /**
+    *//**
      * Вызывается в методе {@link #onStart()} через вспомогательный класс.
-     */
+     *//*
     @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE})
     void processInputIntentOld() {
         processInputIntent();
@@ -160,7 +126,7 @@ public class PanoramaActivity extends AppCompatActivity {
             return;
         }
 
-        final Uri dataUri = /*intent.getData()*/
+        final Uri dataUri = *//*intent.getData()*//*
                 intent.getClipData().getItemAt(0).getUri();
 
         if (null == dataUri) {
@@ -343,5 +309,5 @@ public class PanoramaActivity extends AppCompatActivity {
             mCamera = mPLManager.getCamera();
             return mCamera;
         }
-    }
+    }*/
 }

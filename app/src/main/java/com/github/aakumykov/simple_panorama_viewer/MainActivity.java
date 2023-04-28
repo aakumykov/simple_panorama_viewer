@@ -30,11 +30,9 @@ public class MainActivity extends AppCompatActivity {
 
         mFragmentManager = getSupportFragmentManager();
 
-        /*getSupportFragmentManager().beginTransaction()
-                .add(PanoramaFragment.create())
-                .commit();*/
 
-//        askForPermissions();
+
+        askForPermissions();
     }
 
     @Override
@@ -75,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     @OnPermissionDenied({Manifest.permission.READ_EXTERNAL_STORAGE})
+//    @OnNeverAskAgain({Manifest.permission.READ_EXTERNAL_STORAGE})
     void showNoPermissionErrorOld() {
         showNoPermissionFragment("Отсутствует разрешение READ_EXTERNAL_STORAGE");
     }
