@@ -14,7 +14,7 @@ class IntentWrapper {
 
     public IntentWrapper(@Nullable Intent intent) {
         mIntent = intent;
-        processDataFromIntent();
+        processIntent();
     }
 
 
@@ -39,7 +39,7 @@ class IntentWrapper {
     }
 
 
-    private void processDataFromIntent() {
+    private void processIntent() {
 
         if (null == mIntent) {
             setError("Intent is null");
@@ -58,10 +58,8 @@ class IntentWrapper {
         }
 
         mDataURI = clipData.getItemAt(0).getUri();
-        if (null == mDataURI) {
+        if (null == mDataURI)
             setError("Data URI is null");
-            return;
-        }
     }
 
     public boolean hasError() {

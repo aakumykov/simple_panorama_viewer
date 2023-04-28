@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding mBinding;
     private FragmentManager mFragmentManager;
     @Nullable private IntentWrapper mIntentProcessor;
+    @Nullable private PanoramaFragment mPanoramaFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -64,7 +65,13 @@ public class MainActivity extends AppCompatActivity {
         // TODO: pause panoramic view
     }
 
-
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (null != mPanoramaFragment)
+            return mPanoramaFragment.onTouchEvent(event);
+        else
+            return super.onTouchEvent(event);
+    }
 
     public void startToWork(@Nullable Intent intent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
@@ -101,7 +108,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showPanoramaFragment(Uri fileURI) {
-        setFragment(PanoramaFragment.create(fileURI));
+        mPanoramaFragment = PanoramaFragment.create(fileURI);
+        setFragment(mPanoramaFragment);
     }
 
     private void showFileSelectionFragment() {
