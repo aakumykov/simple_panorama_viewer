@@ -114,7 +114,7 @@ public class PanoramaFragment extends Fragment {
     public boolean onTouchEvent(MotionEvent event) {
         if (null != mPLManager)
             return mPLManager.onTouchEvent(event);
-        return ;
+        return false;
     }
 
 
