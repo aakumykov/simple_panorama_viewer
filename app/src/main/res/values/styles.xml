@@ -1,8 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="pano_view_arrows">
-        <item name="android:layout_width">@dimen/pano_view_arrow_size</item>
-        <item name="android:layout_height">@dimen/pano_view_arrow_size</item>
-        <item name="android:background">@drawable/shape_panorama_arrow_background</item>
-    </style>
 </resources>
