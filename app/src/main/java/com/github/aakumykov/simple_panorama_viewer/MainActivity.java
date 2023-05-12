@@ -2,7 +2,6 @@ package com.github.aakumykov.simple_panorama_viewer;
 
 import android.Manifest;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -10,59 +9,82 @@ import android.view.MotionEvent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.github.aakumykov.panorama_fragment.PanoramaFragment;
 import com.github.aakumykov.simple_panorama_viewer.databinding.ActivityMainBinding;
 
 import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.RuntimePermissions;
 
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding mBinding;
+    public static final int CODE_OPEN_IMAGE = 10;
+    private static final String TAG = MainActivity.class.getSimpleName();
     private FragmentManager mFragmentManager;
-    @Nullable private IntentWrapper mIntentProcessor;
+    private FragmentManager.FragmentLifecycleCallbacks mFragmentLifecycleCallbacks;
     @Nullable private PanoramaFragment mPanoramaFragment;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(mBinding.getRoot());
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         mFragmentManager = getSupportFragmentManager();
 
-        startToWork(getIntent());
+        mFragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+            @Override
+            public void onFragmentDetached(@NonNull FragmentManager fm, @NonNull Fragment f) {
+                super.onFragmentDetached(fm, f);
+                if (f instanceof PanoramaFragment)
+                    mPanoramaFragment = null;
+            }
+        };
+
+        mFragmentManager.registerFragmentLifecycleCallbacks(mFragmentLifecycleCallbacks, false);
+
+        mFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragmentContainerView, StartFragment.create(), null)
+                .setReorderingAllowed(true)
+                .commit();
+
+        mFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainerView, StartFragment.create(), null)
+                .commit();
+
+        askForPermissions();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mFragmentManager.unregisterFragmentLifecycleCallbacks(mFragmentLifecycleCallbacks);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (CODE_OPEN_IMAGE == requestCode)
+            if (RESULT_OK == resultCode)
+                processInputIntent(data);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        startToWork(intent);
+        processInputIntent(intent);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // TODO: unpause pano view
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // TODO: pause panoramic view
     }
 
     @Override
@@ -73,75 +95,35 @@ public class MainActivity extends AppCompatActivity {
             return super.onTouchEvent(event);
     }
 
-    public void startToWork(@Nullable Intent intent) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            MainActivityPermissionsDispatcher.startToWorkNewWithPermissionCheck(this, intent);
+    private void processInputIntent(Intent intent) {
+
+        mPanoramaFragment = PanoramaFragment.create(intent);
+
+        mFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragmentContainerView, mPanoramaFragment, null)
+                .addToBackStack(null)
+                .setReorderingAllowed(true)
+                .commit();
+    }
+
+
+    private void askForPermissions() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+            MainActivityPermissionsDispatcher.startWorkOldWithPermissionCheck(this);
         else
-            MainActivityPermissionsDispatcher.startToWorkOldWithPermissionCheck(this, intent);
+            MainActivityPermissionsDispatcher.startWorkNewWithPermissionCheck(this);
+    }
+
+    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE})
+    void startWorkOld() {
+        processInputIntent(getIntent());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @NeedsPermission({Manifest.permission.READ_MEDIA_IMAGES})
-    void startToWorkNew(@Nullable Intent intent) {
-        processInputIntent(intent);
+    void startWorkNew() {
+        processInputIntent(getIntent());
     }
 
-    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE})
-    void startToWorkOld(@Nullable Intent intent) {
-        processInputIntent(intent);
-    }
-
-    
-    private void processInputIntent(@Nullable Intent intent) {
-
-        IntentWrapper intentWrapper = new IntentWrapper(intent);
-
-        if (intentWrapper.hasError()) {
-            showErrorFragment(intentWrapper.getError());
-            return;
-        }
-
-        if (intentWrapper.hasData())
-            showPanoramaFragment(intentWrapper.getDataURI());
-        else
-            showFileSelectionFragment();
-    }
-
-    private void showPanoramaFragment(Uri fileURI) {
-        mPanoramaFragment = PanoramaFragment.create(fileURI);
-        setFragment(mPanoramaFragment);
-    }
-
-    private void showFileSelectionFragment() {
-        setFragment(FileSelectionFragment.create());
-    }
-
-
-    @OnPermissionDenied({Manifest.permission.READ_EXTERNAL_STORAGE})
-//    @OnNeverAskAgain({Manifest.permission.READ_EXTERNAL_STORAGE})
-    void showNoPermissionErrorOld() {
-        showErrorFragment("Отсутствует разрешение READ_EXTERNAL_STORAGE");
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    @OnPermissionDenied({Manifest.permission.READ_MEDIA_IMAGES})
-    void showNoPermissionErrorNew() {
-        showErrorFragment("Отсутствует разрешение READ_MEDIA_IMAGES");
-    }
-
-    private void showErrorFragment(@StringRes int errorMsgStringRes) {
-        showErrorFragment(getString(errorMsgStringRes));
-    }
-
-    private void showErrorFragment(String errorMsg) {
-        mFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainerView, ErrorFragment.create(errorMsg), null)
-                .commit();
-    }
-
-    private void setFragment(Fragment fragment) {
-        mFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainerView, fragment, null)
-                .commit();
-    }
 }
