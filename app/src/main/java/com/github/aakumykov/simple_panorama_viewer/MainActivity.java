@@ -1,6 +1,7 @@
 package com.github.aakumykov.simple_panorama_viewer;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -10,6 +11,8 @@ import android.view.MotionEvent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -40,6 +43,14 @@ public class MainActivity extends AppCompatActivity {
         mFragmentManager = getSupportFragmentManager();
 
         mFragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+            @Override
+            public void onFragmentAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
+                if (f instanceof HasCustomTitle)
+                    showTitleBar(((HasCustomTitle) f).getTitle());
+                else
+                    hideTitleBar();
+            }
+
             @Override
             public void onFragmentDetached(@NonNull FragmentManager fm, @NonNull Fragment f) {
                 super.onFragmentDetached(fm, f);
@@ -128,4 +139,18 @@ public class MainActivity extends AppCompatActivity {
         processInputIntent(getIntent());
     }
 
+
+    private void showTitleBar(@StringRes int title) {
+        ActionBar actionBar = getSupportActionBar();
+        if (null != actionBar) {
+            actionBar.setTitle(title);
+            actionBar.show();
+        }
+    }
+
+    private void hideTitleBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (null != actionBar)
+            actionBar.hide();
+    }
 }

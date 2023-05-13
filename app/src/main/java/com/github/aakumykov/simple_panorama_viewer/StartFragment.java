@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 
 import com.github.aakumykov.simple_panorama_viewer.databinding.FragmentStartBinding;
 
-public class StartFragment extends Fragment {
+public class StartFragment extends Fragment implements HasCustomTitle {
 
     public static StartFragment create() {
         return new StartFragment();
@@ -39,5 +39,10 @@ public class StartFragment extends Fragment {
         intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("image/*");
         requireActivity().startActivityForResult(intent, MainActivity.CODE_OPEN_IMAGE);
+    }
+
+    @Override
+    public int getTitle() {
+        return R.string.app_name;
     }
 }
