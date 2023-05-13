@@ -109,13 +109,12 @@ public class MainActivity extends AppCompatActivity {
             mFragmentManager
                     .beginTransaction()
                     .replace(R.id.fragmentContainerView, mPanoramaFragment, null)
-                    .setReorderingAllowed(true)
                     .commit();
         }
         else {
             mFragmentManager
                     .beginTransaction()
-                    .add(R.id.fragmentContainerView, StartFragment.create(), null)
+                    .replace(R.id.fragmentContainerView, StartFragment.create(), null)
                     .commit();
         }
     }
