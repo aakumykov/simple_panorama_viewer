@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager mFragmentManager;
     private FragmentManager.FragmentLifecycleCallbacks mFragmentLifecycleCallbacks;
     @Nullable private PanoramaFragment mPanoramaFragment;
+    private Fragment mNewFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFragmentDetached(@NonNull FragmentManager fm, @NonNull Fragment f) {
                 super.onFragmentDetached(fm, f);
-                if (f instanceof PanoramaFragment)
+                // Обуляю поле mPanoramaFragment, только если открывается начальный экран (не панорамный).
+                if (f instanceof PanoramaFragment && newFragmentIsStartingFragment())
                     mPanoramaFragment = null;
             }
         };
@@ -106,15 +108,20 @@ public class MainActivity extends AppCompatActivity {
 
             mPanoramaFragment = PanoramaFragment.create(fileUri);
 
+            mNewFragment = mPanoramaFragment;
+
             mFragmentManager
                     .beginTransaction()
                     .replace(R.id.fragmentContainerView, mPanoramaFragment, null)
                     .commit();
         }
         else {
+
+            mNewFragment = StartFragment.create();
+
             mFragmentManager
                     .beginTransaction()
-                    .replace(R.id.fragmentContainerView, StartFragment.create(), null)
+                    .replace(R.id.fragmentContainerView, mNewFragment, null)
                     .commit();
         }
     }
@@ -151,5 +158,9 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (null != actionBar)
             actionBar.hide();
+    }
+
+    private boolean newFragmentIsStartingFragment() {
+        return mNewFragment instanceof StartFragment;
     }
 }
