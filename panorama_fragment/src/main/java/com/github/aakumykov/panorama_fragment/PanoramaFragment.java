@@ -1,7 +1,6 @@
 package com.github.aakumykov.panorama_fragment;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.aakumykov.panorama_fragment.databinding.FragmentPanoramaBinding;
@@ -42,10 +40,6 @@ public class PanoramaFragment extends Fragment {
     private PLManager mPlManager;
     private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
-
-    public static PanoramaFragment create(@Nullable Intent intent) {
-        return create(IntentUriExtractor.getUri(intent, TAG));
-    }
 
     public static PanoramaFragment create(Uri fileURI) {
 

@@ -2,6 +2,7 @@ package com.github.aakumykov.simple_panorama_viewer;
 
 import android.Manifest;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.github.aakumykov.panorama_fragment.IntentUriExtractor;
 import com.github.aakumykov.panorama_fragment.PanoramaFragment;
 import com.github.aakumykov.simple_panorama_viewer.databinding.ActivityMainBinding;
 
@@ -47,16 +49,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
         mFragmentManager.registerFragmentLifecycleCallbacks(mFragmentLifecycleCallbacks, false);
-
-        mFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentContainerView, StartFragment.create(), null)
-                .setReorderingAllowed(true)
-                .commit();
-
-        mFragmentManager.beginTransaction()
-                .add(R.id.fragmentContainerView, StartFragment.create(), null)
-                .commit();
 
         askForPermissions();
     }
@@ -97,14 +89,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void processInputIntent(Intent intent) {
 
-        mPanoramaFragment = PanoramaFragment.create(intent);
+        final Uri fileUri = IntentUriExtractor.getUri(intent, TAG);
 
-        mFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentContainerView, mPanoramaFragment, null)
-                .addToBackStack(null)
-                .setReorderingAllowed(true)
-                .commit();
+        if (null != fileUri) {
+
+            mPanoramaFragment = PanoramaFragment.create(fileUri);
+
+            mFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainerView, mPanoramaFragment, null)
+                    .setReorderingAllowed(true)
+                    .commit();
+        }
+        else {
+            mFragmentManager
+                    .beginTransaction()
+                    .add(R.id.fragmentContainerView, StartFragment.create(), null)
+                    .commit();
+        }
     }
 
 
