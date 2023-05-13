@@ -8,9 +8,13 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.aakumykov.panorama_fragment.databinding.FragmentPanoramaBinding;
@@ -63,6 +67,8 @@ public class PanoramaFragment extends Fragment {
         mPlManager = new PLManager(requireContext());
         mPlManager.setContentView(mBinding.panoramaView);
         mPlManager.onCreate();
+
+        enterFullScreen();
 
         return mBinding.getRoot();
     }
@@ -154,5 +160,18 @@ public class PanoramaFragment extends Fragment {
         Toast.makeText(requireContext(), getString(R.string.ERROR_error, errorMsg), Toast.LENGTH_SHORT).show();
         Log.e(TAG, errorMsg);
         getParentFragmentManager().popBackStack();
+    }
+
+    private void enterFullScreen() {
+        Window window = requireActivity().getWindow();
+
+        WindowInsetsControllerCompat windowInsetsController =
+                WindowCompat.getInsetsController(window, window.getDecorView());
+
+        windowInsetsController.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        );
+
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
     }
 }
