@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFragmentDetached(@NonNull FragmentManager fm, @NonNull Fragment f) {
                 super.onFragmentDetached(fm, f);
                 // Обуляю поле mPanoramaFragment, только если открывается начальный экран (не панорамный).
-                if (f instanceof PanoramaFragment && newFragmentIsStartingFragment())
+                if (f instanceof PanoramaFragment/* && newFragmentIsStartingFragment()*/)
                     mPanoramaFragment = null;
             }
         };
