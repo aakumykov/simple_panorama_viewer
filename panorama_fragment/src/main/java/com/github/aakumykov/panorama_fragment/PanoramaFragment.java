@@ -69,6 +69,7 @@ public class PanoramaFragment extends Fragment {
         mPlManager.onCreate();
 
         enterFullScreen();
+        processInputData();
 
         return mBinding.getRoot();
     }
@@ -91,7 +92,6 @@ public class PanoramaFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        processInputData();
     }
 
     @Override
