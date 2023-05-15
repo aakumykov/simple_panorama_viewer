@@ -1,6 +1,5 @@
 package com.github.aakumykov.simple_panorama_viewer;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.github.aakumykov.panorama_fragment.PanoramaFragment;
 import com.github.aakumykov.simple_panorama_viewer.databinding.FragmentStartBinding;
 
 public class StartFragment extends Fragment implements HasCustomTitle {
@@ -35,10 +35,7 @@ public class StartFragment extends Fragment implements HasCustomTitle {
     }
 
     private void onSelectPanoramaClicked(View view) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-        intent.setType("image/*");
-        requireActivity().startActivityForResult(intent, MainActivity.CODE_OPEN_IMAGE);
+        requireActivity().startActivityForResult(PanoramaFragment.openImageIntent(), PanoramaFragment.CODE_OPEN_IMAGE);
     }
 
     @Override

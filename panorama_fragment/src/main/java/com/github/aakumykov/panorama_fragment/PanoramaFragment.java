@@ -1,6 +1,7 @@
 package com.github.aakumykov.panorama_fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +35,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class PanoramaFragment extends Fragment implements FullscreenController.Callback {
 
+    public static final int CODE_OPEN_IMAGE = 10;
     private static final String FILE_URI_STRING = "FILE_URI_STRING";
     private static final String TAG = PanoramaFragment.class.getSimpleName();
 
@@ -55,6 +57,13 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         return panoramaFragment;
     }
 
+    public static Intent openImageIntent() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("image/*");
+        return intent;
+    }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,7 +71,8 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         mBinding = FragmentPanoramaBinding.inflate(inflater, container, false);
 
         mBinding.toggleFullscreenIcon.setOnClickListener(v -> toggleFullscreen());
-        mBinding.exitButton.setOnClickListener(v -> requireActivity().finish());
+        mBinding.exitButton.setOnClickListener(v -> exitApp());
+        mBinding.openButton.setOnClickListener(v -> openFile());
 
         mPlManager = new PLManager(requireContext());
         mPlManager.setContentView(mBinding.panoramaView);
@@ -73,6 +83,14 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         mFullscreenController.setCallback(this);
 
         return mBinding.getRoot();
+    }
+
+    private void exitApp() {
+        requireActivity().finish();
+    }
+
+    private void openFile() {
+        requireActivity().startActivityForResult(openImageIntent(), CODE_OPEN_IMAGE);
     }
 
     private void toggleFullscreen() {
@@ -86,6 +104,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mFullscreenController.enterFullScreen();
         processInputData();
     }
 
@@ -183,10 +202,22 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     }
 
     private void showUserInterface() {
-        mBinding.toggleFullscreenIcon.setVisibility(View.VISIBLE);
+        showView(mBinding.openButton);
+        showView(mBinding.exitButton);
+        showView(mBinding.toggleFullscreenIcon);
     }
 
     private void hideUserInterface() {
-        mBinding.toggleFullscreenIcon.setVisibility(View.GONE);
+        hideView(mBinding.openButton);
+        hideView(mBinding.exitButton);
+        hideView(mBinding.toggleFullscreenIcon);
+    }
+
+    private void showView(View view) {
+        view.setVisibility(View.VISIBLE);
+    }
+
+    private void hideView(View view) {
+        view.setVisibility(View.GONE);
     }
 }

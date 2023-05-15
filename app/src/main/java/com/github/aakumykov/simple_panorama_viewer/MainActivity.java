@@ -27,7 +27,6 @@ import permissions.dispatcher.RuntimePermissions;
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity {
 
-    public static final int CODE_OPEN_IMAGE = 10;
     private static final String TAG = MainActivity.class.getSimpleName();
     private FragmentManager mFragmentManager;
     private FragmentManager.FragmentLifecycleCallbacks mFragmentLifecycleCallbacks;
@@ -56,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
             public void onFragmentDetached(@NonNull FragmentManager fm, @NonNull Fragment f) {
                 super.onFragmentDetached(fm, f);
                 // Обуляю поле mPanoramaFragment, только если открывается начальный экран (не панорамный).
-                if (f instanceof PanoramaFragment/* && newFragmentIsStartingFragment()*/)
-                    mPanoramaFragment = null;
+//                if (!(f instanceof PanoramaFragment)/* && newFragmentIsStartingFragment()*/)
+//                    mPanoramaFragment = null;
             }
         };
 
@@ -75,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (CODE_OPEN_IMAGE == requestCode)
+        if (PanoramaFragment.CODE_OPEN_IMAGE == requestCode)
             if (RESULT_OK == resultCode)
                 processInputIntent(data);
     }
