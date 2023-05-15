@@ -61,7 +61,8 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
         mBinding = FragmentPanoramaBinding.inflate(inflater, container, false);
 
-        mBinding.toggleFullscreenIcon.setOnClickListener(view -> toggleFullscreen());
+        mBinding.toggleFullscreenIcon.setOnClickListener(v -> toggleFullscreen());
+        mBinding.exitButton.setOnClickListener(v -> requireActivity().finish());
 
         mPlManager = new PLManager(requireContext());
         mPlManager.setContentView(mBinding.panoramaView);
