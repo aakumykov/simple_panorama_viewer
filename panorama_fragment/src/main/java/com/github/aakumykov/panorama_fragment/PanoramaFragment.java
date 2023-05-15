@@ -43,6 +43,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     private FragmentPanoramaBinding mBinding;
     private PLManager mPlManager;
     private FullscreenController mFullscreenController;
+    private boolean mUserInterfaceVisible = true;
 
     public static PanoramaFragment create(Uri fileURI) {
 
@@ -70,6 +71,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
         mBinding = FragmentPanoramaBinding.inflate(inflater, container, false);
 
+        mBinding.panoramaView.setOnClickListener(v -> toggleUserInterface());
         mBinding.toggleFullscreenIcon.setOnClickListener(v -> toggleFullscreen());
         mBinding.exitButton.setOnClickListener(v -> exitApp());
         mBinding.openButton.setOnClickListener(v -> openFile());
@@ -83,6 +85,13 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         mFullscreenController.setCallback(this);
 
         return mBinding.getRoot();
+    }
+
+    private void toggleUserInterface() {
+        if (mUserInterfaceVisible)
+            hideUserInterface();
+        else
+            showUserInterface();
     }
 
     private void exitApp() {
@@ -205,12 +214,16 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         showView(mBinding.openButton);
         showView(mBinding.exitButton);
         showView(mBinding.toggleFullscreenIcon);
+
+        mUserInterfaceVisible = true;
     }
 
     private void hideUserInterface() {
         hideView(mBinding.openButton);
         hideView(mBinding.exitButton);
         hideView(mBinding.toggleFullscreenIcon);
+
+        mUserInterfaceVisible = false;
     }
 
     private void showView(View view) {
