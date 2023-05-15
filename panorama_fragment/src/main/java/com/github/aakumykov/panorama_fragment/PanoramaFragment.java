@@ -8,13 +8,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.aakumykov.panorama_fragment.databinding.FragmentPanoramaBinding;
@@ -35,15 +32,15 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Фрагмент или показывает панораму или выдаёт toast-сообщение об ошибке и закрывает сам себя.
  */
-public class PanoramaFragment extends Fragment {
+public class PanoramaFragment extends Fragment implements FullscreenController.Callback {
 
     private static final String FILE_URI_STRING = "FILE_URI_STRING";
     private static final String TAG = PanoramaFragment.class.getSimpleName();
 
+    private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private FragmentPanoramaBinding mBinding;
     private PLManager mPlManager;
-    private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
-
+    private FullscreenController mFullscreenController;
 
     public static PanoramaFragment create(Uri fileURI) {
 
@@ -64,14 +61,31 @@ public class PanoramaFragment extends Fragment {
 
         mBinding = FragmentPanoramaBinding.inflate(inflater, container, false);
 
+        mBinding.toggleFullscreenIcon.setOnClickListener(view -> toggleFullscreen());
+
         mPlManager = new PLManager(requireContext());
         mPlManager.setContentView(mBinding.panoramaView);
         mPlManager.onCreate();
 
-        enterFullScreen();
-        processInputData();
+        mFullscreenController = new FullscreenController(requireActivity(),
+                FullscreenController.ShowSystemBarsBehaviour.SHOW_BY_SWIPE);
+        mFullscreenController.setCallback(this);
 
         return mBinding.getRoot();
+    }
+
+    private void toggleFullscreen() {
+        if (mFullscreenController.isFullScreen())
+            mFullscreenController.exitFullScreen();
+        else
+            mFullscreenController.enterFullScreen();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        processInputData();
     }
 
     @Override
@@ -87,11 +101,6 @@ public class PanoramaFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mPlManager.onResume();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -162,16 +171,21 @@ public class PanoramaFragment extends Fragment {
         getParentFragmentManager().popBackStack();
     }
 
-    private void enterFullScreen() {
-        Window window = requireActivity().getWindow();
+    @Override
+    public void onEnterFullScreen() {
+        hideUserInterface();
+    }
 
-        WindowInsetsControllerCompat windowInsetsController =
-                WindowCompat.getInsetsController(window, window.getDecorView());
+    @Override
+    public void onExitFullScreen() {
+        showUserInterface();
+    }
 
-        windowInsetsController.setSystemBarsBehavior(
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        );
+    private void showUserInterface() {
+        mBinding.toggleFullscreenIcon.setVisibility(View.VISIBLE);
+    }
 
-        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
+    private void hideUserInterface() {
+        mBinding.toggleFullscreenIcon.setVisibility(View.GONE);
     }
 }
