@@ -4,6 +4,6 @@
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:layout_margin">8dp</item>
-        <item name="android:background">@color/fullscreen_button_bg</item>
+        <item name="android:background">@drawable/shape_controls_background</item>
     </style>
 </resources>
