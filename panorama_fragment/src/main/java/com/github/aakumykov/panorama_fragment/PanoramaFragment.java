@@ -73,8 +73,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
         mBinding = FragmentPanoramaBinding.inflate(inflater, container, false);
 
-        mBinding.panoramaView.setOnClickListener(v -> toggleUserInterface());
-        mBinding.toggleFullscreenIcon.setOnClickListener(v -> toggleFullscreen());
+        mBinding.toggleFullscreenIcon.setOnClickListener(v -> mFullscreenController.enterFullScreen());
         mBinding.exitButton.setOnClickListener(v -> exitApp());
         mBinding.openButton.setOnClickListener(v -> openFile());
 
@@ -94,8 +93,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         super.onViewCreated(view, savedInstanceState);
 
         processInputData();
-        hideUserInterface();
-        mFullscreenController.enterFullScreen();
+//        mFullscreenController.enterFullScreen();
     }
 
     @Override
@@ -188,20 +186,18 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
     @Override
     public void onEnterFullScreen() {
+        mBinding.rootView.setOnClickListener(v -> mFullscreenController.exitFullScreen());
+        mBinding.toggleFullscreenIcon.setOnClickListener(v -> mFullscreenController.exitFullScreen());
         mBinding.toggleFullscreenIcon.setImageResource(R.drawable.ic_baseline_fullscreen_exit_24);
         hideUserInterface();
     }
 
     @Override
     public void onExitFullScreen() {
+        mBinding.rootView.setOnClickListener(v -> mFullscreenController.enterFullScreen());
+        mBinding.toggleFullscreenIcon.setOnClickListener(v -> mFullscreenController.enterFullScreen());
         mBinding.toggleFullscreenIcon.setImageResource(R.drawable.ic_baseline_fullscreen_24);
-
-        // Пропускаю первую реакцию на "выход из полноэкранного режима",
-        // так как она запускается из-за того, что по умолчанию Activity стартует не в этом режиме.
-//        if (mIsFirstRun)
-//            mIsFirstRun = false;
-//        else
-//            showUserInterface();
+        showUserInterface();
     }
 
 
