@@ -15,32 +15,31 @@ public class FullscreenController implements View.OnApplyWindowInsetsListener {
 
     private final WindowInsetsControllerCompat mWindowInsetsControllerCompat;
     private final ShowSystemBarsBehaviour mShowBarsBehaviour;
+    private final View mDecorView;
     @Nullable private Callback mCallback;
     private boolean mIsFullScreen = false;
+
 
     public FullscreenController(Activity activity, ShowSystemBarsBehaviour showSystemBarsBehaviour) {
 
         mShowBarsBehaviour = showSystemBarsBehaviour;
 
         final Window window = activity.getWindow();
-        final View decorView = window.getDecorView();
+        mDecorView = window.getDecorView();
 
-        decorView.setOnApplyWindowInsetsListener(this);
-
-        mWindowInsetsControllerCompat = WindowCompat.getInsetsController(window, decorView);
+        mDecorView.setOnApplyWindowInsetsListener(this);
+        mWindowInsetsControllerCompat = WindowCompat.getInsetsController(window, mDecorView);
 
         mWindowInsetsControllerCompat.setSystemBarsBehavior(systemBarsBehaviour());
     }
 
 
     public void enterFullScreen() {
-        if (null != mWindowInsetsControllerCompat)
-            mWindowInsetsControllerCompat.hide(WindowInsetsCompat.Type.systemBars());
+        mWindowInsetsControllerCompat.hide(WindowInsetsCompat.Type.systemBars());
     }
 
     public void exitFullScreen() {
-        if (null != mWindowInsetsControllerCompat)
-            mWindowInsetsControllerCompat.show(WindowInsetsCompat.Type.systemBars());
+        mWindowInsetsControllerCompat.show(WindowInsetsCompat.Type.systemBars());
     }
 
 

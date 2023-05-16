@@ -20,23 +20,29 @@
         style="@style/panorama_view_control_button"
         android:contentDescription="@string/description_exit_button"
         android:src="@drawable/ic_baseline_folder_open_24"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/toggleFullscreenIcon"
         style="@style/panorama_view_control_button"
+        android:contentDescription="@string/description_fullscreen_button"
         android:src="@drawable/ic_baseline_fullscreen_24"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="@string/description_fullscreen_button"/>
+        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/exitButton"
         style="@style/panorama_view_control_button"
         android:contentDescription="@string/description_exit_button"
         android:src="@drawable/ic_baseline_close_24"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
