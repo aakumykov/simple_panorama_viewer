@@ -97,7 +97,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         super.onViewCreated(view, savedInstanceState);
 
         processInputData();
-//        mFullscreenController.enterFullScreen();
+        mFullscreenController.enterFullScreen();
     }
 
     @Override
