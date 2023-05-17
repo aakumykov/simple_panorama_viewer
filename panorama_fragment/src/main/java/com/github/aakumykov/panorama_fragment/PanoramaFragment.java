@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.aakumykov.panorama_fragment.databinding.FragmentPanoramaBinding;
@@ -45,7 +47,8 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     private PLManager mPlManager;
     private FullscreenController mFullscreenController;
     private boolean mUserInterfaceVisible = false;
-    private final boolean mIsFirstRun = true;
+
+    private GestureDetectorCompat mGestureDetectorCompat;
 
     public static PanoramaFragment create(Uri fileURI) {
 
@@ -73,6 +76,8 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
         mBinding = FragmentPanoramaBinding.inflate(inflater, container, false);
 
+        mGestureDetectorCompat = new GestureDetectorCompat(requireContext(), new CustomGestureListener());
+
         mBinding.toggleFullscreenIcon.setOnClickListener(v -> mFullscreenController.enterFullScreen());
         mBinding.exitButton.setOnClickListener(v -> exitApp());
         mBinding.openButton.setOnClickListener(v -> openFile());
@@ -81,8 +86,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         mPlManager.setContentView(mBinding.panoramaView);
         mPlManager.onCreate();
 
-        mFullscreenController = new FullscreenController(requireActivity(),
-                FullscreenController.ShowSystemBarsBehaviour.SHOW_BY_SWIPE);
+        mFullscreenController = new FullscreenController(requireActivity(), FullscreenController.SHOW_TRANSIENT_BARS_BY_SWIPE);
         mFullscreenController.setCallback(this);
 
         return mBinding.getRoot();
@@ -124,6 +128,8 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
 
     public boolean onTouchEvent(MotionEvent event) {
+        if (mGestureDetectorCompat.onTouchEvent(event))
+            return true;
         return mPlManager.onTouchEvent(event);
     }
 
@@ -186,7 +192,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
     @Override
     public void onEnterFullScreen() {
-        mBinding.rootView.setOnClickListener(v -> mFullscreenController.exitFullScreen());
+//        mBinding.rootView.setOnClickListener(v -> mFullscreenController.exitFullScreen());
         mBinding.toggleFullscreenIcon.setOnClickListener(v -> mFullscreenController.exitFullScreen());
         mBinding.toggleFullscreenIcon.setImageResource(R.drawable.ic_baseline_fullscreen_exit_24);
         hideUserInterface();
@@ -194,7 +200,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
     @Override
     public void onExitFullScreen() {
-        mBinding.rootView.setOnClickListener(v -> mFullscreenController.enterFullScreen());
+//        mBinding.rootView.setOnClickListener(v -> mFullscreenController.enterFullScreen());
         mBinding.toggleFullscreenIcon.setOnClickListener(v -> mFullscreenController.enterFullScreen());
         mBinding.toggleFullscreenIcon.setImageResource(R.drawable.ic_baseline_fullscreen_24);
         showUserInterface();
@@ -246,5 +252,18 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
     private void hideView(View view) {
         view.setVisibility(View.GONE);
+    }
+
+
+    public class CustomGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+            if (mFullscreenController.isFullScreen())
+                mFullscreenController.exitFullScreen();
+            else
+                mFullscreenController.enterFullScreen();
+            return true;
+        }
     }
 }

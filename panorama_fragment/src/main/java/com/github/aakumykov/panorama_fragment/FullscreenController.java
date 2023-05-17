@@ -13,22 +13,26 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 public class FullscreenController implements View.OnApplyWindowInsetsListener {
 
+    public static final int SHOW_TRANSIENT_BARS_BY_SWIPE = 1;
+    public static final int SHOW_BARS_BY_TOUCH = 2;
+    public static final int SHOW_BARS_BY_SWIPE = 3;
+
     private final WindowInsetsControllerCompat mWindowInsetsControllerCompat;
-    private final ShowSystemBarsBehaviour mShowBarsBehaviour;
-    private final View mDecorView;
+    private final int mShowBarsBehaviour;
+
     @Nullable private Callback mCallback;
     private boolean mIsFullScreen = false;
 
 
-    public FullscreenController(Activity activity, ShowSystemBarsBehaviour showSystemBarsBehaviour) {
+    public FullscreenController(Activity activity, int showSystemBarsBehaviour) {
 
         mShowBarsBehaviour = showSystemBarsBehaviour;
 
         final Window window = activity.getWindow();
-        mDecorView = window.getDecorView();
+        View decorView = window.getDecorView();
 
-        mDecorView.setOnApplyWindowInsetsListener(this);
-        mWindowInsetsControllerCompat = WindowCompat.getInsetsController(window, mDecorView);
+        decorView.setOnApplyWindowInsetsListener(this);
+        mWindowInsetsControllerCompat = WindowCompat.getInsetsController(window, decorView);
 
         mWindowInsetsControllerCompat.setSystemBarsBehavior(systemBarsBehaviour());
     }
@@ -56,7 +60,6 @@ public class FullscreenController implements View.OnApplyWindowInsetsListener {
         return mIsFullScreen;
     }
 
-
     @Override
     public WindowInsets onApplyWindowInsets(View v, WindowInsets windowInsets) {
 
@@ -83,19 +86,14 @@ public class FullscreenController implements View.OnApplyWindowInsetsListener {
         void onExitFullScreen();
     }
 
-    public enum ShowSystemBarsBehaviour {
-        SHOW_BY_TOUCH,
-        SHOW_BY_SWIPE,
-        SHOW_TRANSIENT_BY_SWIPE
-    }
 
     private int systemBarsBehaviour() {
         switch (mShowBarsBehaviour) {
-            case SHOW_BY_TOUCH:
+            case SHOW_BARS_BY_TOUCH:
                 return WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH;
-            case SHOW_BY_SWIPE:
+            case SHOW_BARS_BY_SWIPE:
                 return WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE;
-            case SHOW_TRANSIENT_BY_SWIPE:
+            case SHOW_TRANSIENT_BARS_BY_SWIPE:
                 return WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE;
             default:
                 throw new IllegalArgumentException("Неизвестное значение: "+mShowBarsBehaviour);
