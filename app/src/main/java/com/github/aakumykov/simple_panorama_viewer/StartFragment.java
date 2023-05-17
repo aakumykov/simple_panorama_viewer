@@ -23,8 +23,7 @@ public class StartFragment extends Fragment implements HasCustomTitle {
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentStartBinding.inflate(inflater, container, false);
-        mBinding.textView.setOnClickListener(this::onSelectPanoramaClicked);
-        mBinding.imageView.setOnClickListener(this::onSelectPanoramaClicked);
+        mBinding.rootLayout.setOnClickListener(this::onSelectPanoramaClicked);
         return mBinding.getRoot();
     }
 
