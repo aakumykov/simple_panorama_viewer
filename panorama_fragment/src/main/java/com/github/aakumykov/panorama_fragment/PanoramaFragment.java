@@ -216,7 +216,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     }
 
 
-    public class CustomGestureListener extends GestureDetector.SimpleOnGestureListener {
+    private class CustomGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
         public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
