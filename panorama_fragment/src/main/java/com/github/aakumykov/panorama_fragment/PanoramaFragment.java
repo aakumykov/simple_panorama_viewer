@@ -45,6 +45,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     private FragmentPanoramaBinding mBinding;
     private PLManager mPlManager;
     private FullscreenController mFullscreenController;
+    private UserInterfaceController mUserInterfaceController;
     private GestureDetectorCompat mGestureDetectorCompat;
 
     // Для предотвращения мерцания пользовательского интерфейса при первоначальном автоматическом
@@ -91,6 +92,8 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         mFullscreenController = new FullscreenController(requireActivity(), FullscreenController.SHOW_TRANSIENT_BARS_BY_SWIPE);
         mFullscreenController.setCallback(this);
 
+        mUserInterfaceController = new UserInterfaceController();
+
         return mBinding.getRoot();
     }
 
@@ -127,17 +130,16 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 //        mBinding.rootView.setOnClickListener(v -> mFullscreenController.exitFullScreen());
         mBinding.toggleFullscreenIcon.setOnClickListener(v -> mFullscreenController.exitFullScreen());
         mBinding.toggleFullscreenIcon.setImageResource(R.drawable.ic_baseline_fullscreen_exit_24);
-        hideUserInterface();
+        mUserInterfaceController.hideUserInterface();
     }
 
     @Override
     public void onExitFullScreen() {
-//        mBinding.rootView.setOnClickListener(v -> mFullscreenController.enterFullScreen());
         mBinding.toggleFullscreenIcon.setOnClickListener(v -> mFullscreenController.enterFullScreen());
         mBinding.toggleFullscreenIcon.setImageResource(R.drawable.ic_baseline_fullscreen_24);
 
         if (mUserInterfaceWasTouchedByUser)
-            showUserInterface();
+            mUserInterfaceController.showUserInterface();
     }
 
     public boolean onTouchEvent(MotionEvent event) {
@@ -204,26 +206,6 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     }
 
 
-    private void showUserInterface() {
-        showView(mBinding.openButton);
-        showView(mBinding.exitButton);
-        showView(mBinding.toggleFullscreenIcon);
-    }
-
-    private void hideUserInterface() {
-        hideView(mBinding.openButton);
-        hideView(mBinding.exitButton);
-        hideView(mBinding.toggleFullscreenIcon);
-    }
-
-    private void showView(View view) {
-        view.setVisibility(View.VISIBLE);
-    }
-
-    private void hideView(View view) {
-        view.setVisibility(View.GONE);
-    }
-
 
     @SuppressLint("LogNotTimber")
     private void showErrorAndExit(Throwable throwable) {
@@ -232,7 +214,6 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         Log.e(TAG, errorMsg);
         getParentFragmentManager().popBackStack();
     }
-
 
 
     public class CustomGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -247,6 +228,29 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
                 mFullscreenController.enterFullScreen();
 
             return true;
+        }
+    }
+
+    private class UserInterfaceController {
+
+        private void showUserInterface() {
+            showView(mBinding.openButton);
+            showView(mBinding.exitButton);
+            showView(mBinding.toggleFullscreenIcon);
+        }
+
+        private void hideUserInterface() {
+            hideView(mBinding.openButton);
+            hideView(mBinding.exitButton);
+            hideView(mBinding.toggleFullscreenIcon);
+        }
+
+        private void showView(View view) {
+            view.setVisibility(View.VISIBLE);
+        }
+
+        private void hideView(View view) {
+            view.setVisibility(View.GONE);
         }
     }
 }
