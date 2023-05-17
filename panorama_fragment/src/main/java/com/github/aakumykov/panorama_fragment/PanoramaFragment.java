@@ -52,7 +52,6 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     private boolean mUserInterfaceWasTouchedByUser = false;
 
 
-
     public static PanoramaFragment create(Uri fileURI) {
 
         PanoramaFragment panoramaFragment = new PanoramaFragment();
@@ -123,70 +122,6 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         super.onPause();
     }
 
-
-    public boolean onTouchEvent(MotionEvent event) {
-        if (mGestureDetectorCompat.onTouchEvent(event))
-            return true;
-        return mPlManager.onTouchEvent(event);
-    }
-
-
-    private void processInputData() {
-
-        final DisposableObserver<byte[]> disposableObserver =
-
-                Observable.fromCallable(new Callable<byte[]>() {
-                    @Override
-                    public byte[] call() throws Exception {
-                        return FileUriBytesReader.readBytes(
-                                requireContext().getContentResolver(),
-                                BundleReader.getArgument(getArguments(), FILE_URI_STRING));
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-
-            .subscribeWith(new DisposableObserver<byte[]>() {
-                @Override
-                public void onNext(byte[] bytes) {
-                    displayPanorama(bytes);
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    showErrorAndExit(e);
-                }
-
-                @Override
-                public void onComplete() {
-
-                }
-            });
-
-        mCompositeDisposable.add(disposableObserver);
-    }
-
-
-    private void displayPanorama(byte[] fileBytes) {
-
-        PLImage plImage = new PLImage(PLUtils.getBitmap(fileBytes));
-
-        PLSphericalPanorama panorama = new PLSphericalPanorama();
-        panorama.getCamera().lookAt(30.0f, 90.0f);
-
-        panorama.setImage(plImage);
-
-        mPlManager.setPanorama(panorama);
-    }
-
-    @SuppressLint("LogNotTimber")
-    private void showErrorAndExit(Throwable throwable) {
-        final String errorMsg = ExceptionUtils.getErrorMessage(throwable);
-        Toast.makeText(requireContext(), getString(R.string.ERROR_error, errorMsg), Toast.LENGTH_SHORT).show();
-        Log.e(TAG, errorMsg);
-        getParentFragmentManager().popBackStack();
-    }
-
     @Override
     public void onEnterFullScreen() {
 //        mBinding.rootView.setOnClickListener(v -> mFullscreenController.exitFullScreen());
@@ -203,6 +138,60 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
         if (mUserInterfaceWasTouchedByUser)
             showUserInterface();
+    }
+
+    public boolean onTouchEvent(MotionEvent event) {
+        if (mGestureDetectorCompat.onTouchEvent(event))
+            return true;
+        return mPlManager.onTouchEvent(event);
+    }
+
+
+    private void processInputData() {
+
+        final DisposableObserver<byte[]> disposableObserver =
+
+                Observable.fromCallable(new Callable<byte[]>() {
+                            @Override
+                            public byte[] call() throws Exception {
+                                return FileUriBytesReader.readBytes(
+                                        requireContext().getContentResolver(),
+                                        BundleReader.getArgument(getArguments(), FILE_URI_STRING));
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+
+                        .subscribeWith(new DisposableObserver<byte[]>() {
+                            @Override
+                            public void onNext(byte[] bytes) {
+                                displayPanorama(bytes);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                showErrorAndExit(e);
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+
+        mCompositeDisposable.add(disposableObserver);
+    }
+
+    private void displayPanorama(byte[] fileBytes) {
+
+        PLImage plImage = new PLImage(PLUtils.getBitmap(fileBytes));
+
+        PLSphericalPanorama panorama = new PLSphericalPanorama();
+        panorama.getCamera().lookAt(30.0f, 90.0f);
+
+        panorama.setImage(plImage);
+
+        mPlManager.setPanorama(panorama);
     }
 
 
@@ -234,6 +223,16 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     private void hideView(View view) {
         view.setVisibility(View.GONE);
     }
+
+
+    @SuppressLint("LogNotTimber")
+    private void showErrorAndExit(Throwable throwable) {
+        final String errorMsg = ExceptionUtils.getErrorMessage(throwable);
+        Toast.makeText(requireContext(), getString(R.string.ERROR_error, errorMsg), Toast.LENGTH_SHORT).show();
+        Log.e(TAG, errorMsg);
+        getParentFragmentManager().popBackStack();
+    }
+
 
 
     public class CustomGestureListener extends GestureDetector.SimpleOnGestureListener {
