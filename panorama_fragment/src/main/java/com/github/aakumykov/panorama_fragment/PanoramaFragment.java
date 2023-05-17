@@ -40,15 +40,18 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     public static final int CODE_OPEN_IMAGE = 10;
     private static final String FILE_URI_STRING = "FILE_URI_STRING";
     private static final String TAG = PanoramaFragment.class.getSimpleName();
-    private static final String USER_INTERFACE_VISIBLE = "USER_INTERFACE_VISIBLE";
 
     private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private FragmentPanoramaBinding mBinding;
     private PLManager mPlManager;
     private FullscreenController mFullscreenController;
-    private boolean mUserInterfaceVisible = false;
-
     private GestureDetectorCompat mGestureDetectorCompat;
+
+    // Для предотвращения мерцания пользовательского интерфейса при первоначальном автоматическом
+    // событии "выход из полноэкранного режима".
+    private boolean mUserInterfaceWasTouchedByUser = false;
+
+
 
     public static PanoramaFragment create(Uri fileURI) {
 
@@ -98,12 +101,6 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
         processInputData();
         mFullscreenController.enterFullScreen();
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(USER_INTERFACE_VISIBLE, mUserInterfaceVisible);
     }
 
     @Override
@@ -203,16 +200,11 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 //        mBinding.rootView.setOnClickListener(v -> mFullscreenController.enterFullScreen());
         mBinding.toggleFullscreenIcon.setOnClickListener(v -> mFullscreenController.enterFullScreen());
         mBinding.toggleFullscreenIcon.setImageResource(R.drawable.ic_baseline_fullscreen_24);
-        showUserInterface();
-    }
 
-
-    private void toggleUserInterface() {
-        if (mUserInterfaceVisible)
-            hideUserInterface();
-        else
+        if (mUserInterfaceWasTouchedByUser)
             showUserInterface();
     }
+
 
     private void exitApp() {
         requireActivity().finish();
@@ -222,28 +214,17 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         requireActivity().startActivityForResult(openImageIntent(), CODE_OPEN_IMAGE);
     }
 
-    private void toggleFullscreen() {
-        if (mFullscreenController.isFullScreen())
-            mFullscreenController.exitFullScreen();
-        else
-            mFullscreenController.enterFullScreen();
-    }
-
 
     private void showUserInterface() {
         showView(mBinding.openButton);
         showView(mBinding.exitButton);
         showView(mBinding.toggleFullscreenIcon);
-
-        mUserInterfaceVisible = true;
     }
 
     private void hideUserInterface() {
         hideView(mBinding.openButton);
         hideView(mBinding.exitButton);
         hideView(mBinding.toggleFullscreenIcon);
-
-        mUserInterfaceVisible = false;
     }
 
     private void showView(View view) {
@@ -259,10 +240,13 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
         @Override
         public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+            mUserInterfaceWasTouchedByUser = true;
+
             if (mFullscreenController.isFullScreen())
                 mFullscreenController.exitFullScreen();
             else
                 mFullscreenController.enterFullScreen();
+
             return true;
         }
     }
