@@ -5,7 +5,7 @@
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.github.aakumykov.panorama_fragment.PanoramaFragment">
+    tools:context="com.github.aakumykov.panorama_fragment.com.github.aakumykov.simple_panorama_viewer.panorama_fragment.PanoramaFragment">
 
     <FrameLayout
         android:id="@+id/panoramaView"

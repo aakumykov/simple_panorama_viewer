@@ -1,4 +1,4 @@
-package com.github.aakumykov.panorama_fragment;
+package com.github.aakumykov.simple_panorama_viewer.panorama_fragment;
 
 import android.app.Activity;
 import android.view.View;

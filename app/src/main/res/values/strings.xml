@@ -2,4 +2,7 @@
     <string name="app_name">Смотрелка панорам</string>
     <string name="FRAGMENT_START_select_image_tip">Выбрать панораму</string>
     <string name="description_image_selection_icon">Значок выбора панорамы для просмотра</string>
+    <string name="ERROR_error">Ошибка:\n%1$s</string>
+    <string name="description_fullscreen_button">Кнопка переключения полноэкранного режима</string>
+    <string name="description_exit_button">Кнопка закрытия панорамы</string>
 </resources>

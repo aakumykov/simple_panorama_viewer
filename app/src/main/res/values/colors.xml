@@ -12,4 +12,6 @@
     <color name="select_panorama_icon_color">#808080</color>
     <color name="select_panorama_text_color">#707070</color>
 
+    <color name="control_button_bg">#7CFFFFFF</color>
+    <color name="control_button_fg">#555555</color>
 </resources>

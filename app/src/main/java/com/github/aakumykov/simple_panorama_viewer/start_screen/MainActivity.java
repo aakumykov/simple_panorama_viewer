@@ -1,4 +1,4 @@
-package com.github.aakumykov.simple_panorama_viewer;
+package com.github.aakumykov.simple_panorama_viewer.start_screen;
 
 import android.Manifest;
 import android.content.Context;
@@ -17,9 +17,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.github.aakumykov.panorama_fragment.IntentUriExtractor;
-import com.github.aakumykov.panorama_fragment.PanoramaFragment;
+import com.github.aakumykov.simple_panorama_viewer.R;
 import com.github.aakumykov.simple_panorama_viewer.databinding.ActivityMainBinding;
+import com.github.aakumykov.simple_panorama_viewer.panorama_fragment.IntentUriExtractor;
+import com.github.aakumykov.simple_panorama_viewer.panorama_fragment.PanoramaFragment;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;

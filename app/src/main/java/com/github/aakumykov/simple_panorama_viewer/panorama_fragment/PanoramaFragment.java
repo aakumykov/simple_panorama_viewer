@@ -1,4 +1,4 @@
-package com.github.aakumykov.panorama_fragment;
+package com.github.aakumykov.simple_panorama_viewer.panorama_fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -17,7 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.Fragment;
 
-import com.github.aakumykov.panorama_fragment.databinding.FragmentPanoramaBinding;
+import com.github.aakumykov.simple_panorama_viewer.R;
+import com.github.aakumykov.simple_panorama_viewer.databinding.FragmentPanoramaBinding;
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils;
 import com.panoramagl.PLImage;
 import com.panoramagl.PLManager;

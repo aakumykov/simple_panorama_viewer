@@ -1,4 +1,4 @@
-package com.github.aakumykov.simple_panorama_viewer;
+package com.github.aakumykov.simple_panorama_viewer.start_screen;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,8 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.github.aakumykov.panorama_fragment.PanoramaFragment;
+import com.github.aakumykov.simple_panorama_viewer.R;
 import com.github.aakumykov.simple_panorama_viewer.databinding.FragmentStartBinding;
+import com.github.aakumykov.simple_panorama_viewer.panorama_fragment.PanoramaFragment;
 
 public class StartFragment extends Fragment implements HasCustomTitle {
 

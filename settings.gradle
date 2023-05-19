@@ -16,4 +16,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "simple_panorama_viewer"
 include ':app'
-include ':panorama_fragment'
