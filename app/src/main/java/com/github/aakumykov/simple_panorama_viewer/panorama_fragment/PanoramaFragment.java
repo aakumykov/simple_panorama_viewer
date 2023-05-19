@@ -197,7 +197,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         PLICamera camera = panorama.getCamera();
         camera.setZoomLevels(CAMERA_ZOOM_LEVELS_COUNT);
         camera.setZoomLevel(CAMERA_INITIAL_ZOOM_LEVEL);
-        camera.zoomIn(true);
+        camera.zoomIn(false);
 
         panorama.setImage(plImage);
 
