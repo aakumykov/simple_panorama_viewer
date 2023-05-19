@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment;
 
 import com.github.aakumykov.simple_panorama_viewer.R;
 import com.github.aakumykov.simple_panorama_viewer.databinding.FragmentStartBinding;
-import com.github.aakumykov.simple_panorama_viewer.panorama_fragment.PanoramaFragment;
 
 public class StartFragment extends Fragment implements HasCustomTitle {
 
@@ -35,7 +34,7 @@ public class StartFragment extends Fragment implements HasCustomTitle {
     }
 
     private void onSelectPanoramaClicked(View view) {
-        requireActivity().startActivityForResult(PanoramaFragment.openImageIntent(), PanoramaFragment.CODE_OPEN_IMAGE);
+        ((MainActivity) requireActivity()).selectImage();
     }
 
     @Override

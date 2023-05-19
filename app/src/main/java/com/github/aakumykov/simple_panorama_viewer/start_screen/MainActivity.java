@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager mFragmentManager;
     private FragmentManager.FragmentLifecycleCallbacks mFragmentLifecycleCallbacks;
     @Nullable private PanoramaFragment mPanoramaFragment;
-    private Fragment mNewFragment;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
 
         mFragmentManager.registerFragmentLifecycleCallbacks(mFragmentLifecycleCallbacks, false);
 
-        askForPermissions();
+//        askForPermissions();
+        processInputIntent(getIntent());
     }
 
     @Override
@@ -104,11 +105,12 @@ public class MainActivity extends AppCompatActivity {
 
         final Uri fileUri = IntentUriExtractor.getUri(intent, TAG);
 
+        Fragment newFragment;
         if (null != fileUri) {
 
             mPanoramaFragment = PanoramaFragment.create(fileUri);
 
-            mNewFragment = mPanoramaFragment;
+            newFragment = mPanoramaFragment;
 
             mFragmentManager
                     .beginTransaction()
@@ -117,32 +119,13 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
 
-            mNewFragment = StartFragment.create();
+            newFragment = StartFragment.create();
 
             mFragmentManager
                     .beginTransaction()
-                    .replace(R.id.fragmentContainerView, mNewFragment, null)
+                    .replace(R.id.fragmentContainerView, newFragment, null)
                     .commit();
         }
-    }
-
-
-    private void askForPermissions() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
-            MainActivityPermissionsDispatcher.startWorkOldWithPermissionCheck(this);
-        else
-            MainActivityPermissionsDispatcher.startWorkNewWithPermissionCheck(this);
-    }
-
-    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE})
-    void startWorkOld() {
-        processInputIntent(getIntent());
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    @NeedsPermission({Manifest.permission.READ_MEDIA_IMAGES})
-    void startWorkNew() {
-        processInputIntent(getIntent());
     }
 
 
@@ -160,7 +143,26 @@ public class MainActivity extends AppCompatActivity {
             actionBar.hide();
     }
 
-    private boolean newFragmentIsStartingFragment() {
-        return mNewFragment instanceof StartFragment;
+
+    public void selectImage() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+            MainActivityPermissionsDispatcher.selectImageOldWithPermissionCheck(this);
+        else
+            MainActivityPermissionsDispatcher.selectImageNewWithPermissionCheck(this);
+    }
+
+    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE})
+    void selectImageOld() {
+        openFileSelectionDialog();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    @NeedsPermission({Manifest.permission.READ_MEDIA_IMAGES})
+    void selectImageNew() {
+        openFileSelectionDialog();
+    }
+
+    private void openFileSelectionDialog() {
+        startActivityForResult(PanoramaFragment.openImageIntent(), PanoramaFragment.CODE_OPEN_IMAGE);
     }
 }
