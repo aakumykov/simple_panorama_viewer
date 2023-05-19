@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.github.aakumykov.simple_panorama_viewer.R;
 import com.github.aakumykov.simple_panorama_viewer.databinding.FragmentPanoramaBinding;
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils;
+import com.panoramagl.PLICamera;
 import com.panoramagl.PLImage;
 import com.panoramagl.PLManager;
 import com.panoramagl.PLSphericalPanorama;
@@ -190,7 +191,9 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         PLImage plImage = new PLImage(PLUtils.getBitmap(fileBytes));
 
         PLSphericalPanorama panorama = new PLSphericalPanorama();
-        panorama.getCamera().lookAt(30.0f, 90.0f);
+
+        PLICamera camera = panorama.getCamera();
+        camera.zoomIn(true);
 
         panorama.setImage(plImage);
 
