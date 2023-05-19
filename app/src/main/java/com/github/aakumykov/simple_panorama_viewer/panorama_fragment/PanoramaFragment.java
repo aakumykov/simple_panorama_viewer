@@ -229,28 +229,38 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         @Override
         public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
             mUserInterfaceWasTouchedByUser = true;
-
-            if (mFullscreenController.isFullScreen())
+            /*if (mFullscreenController.isFullScreen())
                 mFullscreenController.exitFullScreen();
             else
-                mFullscreenController.enterFullScreen();
-
+                mFullscreenController.enterFullScreen();*/
+            mUserInterfaceController.toggleUserInterface();
             return true;
         }
     }
 
     private class UserInterfaceController {
 
+        private boolean mIsVisible = false;
+
+        private void toggleUserInterface() {
+            if (mIsVisible)
+                hideUserInterface();
+            else
+                showUserInterface();
+        }
+
         private void showUserInterface() {
             showView(mBinding.openButton);
             showView(mBinding.exitButton);
             showView(mBinding.toggleFullscreenIcon);
+            mIsVisible = true;
         }
 
         private void hideUserInterface() {
             hideView(mBinding.openButton);
             hideView(mBinding.exitButton);
             hideView(mBinding.toggleFullscreenIcon);
+            mIsVisible = false;
         }
 
         private void showView(View view) {
