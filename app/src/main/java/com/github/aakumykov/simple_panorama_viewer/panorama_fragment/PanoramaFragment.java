@@ -42,6 +42,8 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     public static final int CODE_OPEN_IMAGE = 10;
     private static final String FILE_URI_STRING = "FILE_URI_STRING";
     private static final String TAG = PanoramaFragment.class.getSimpleName();
+    private static final int CAMERA_ZOOM_LEVELS_COUNT = 10;
+    private static final int CAMERA_INITIAL_ZOOM_LEVEL = 1;
 
     private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private FragmentPanoramaBinding mBinding;
@@ -193,6 +195,8 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         PLSphericalPanorama panorama = new PLSphericalPanorama();
 
         PLICamera camera = panorama.getCamera();
+        camera.setZoomLevels(CAMERA_ZOOM_LEVELS_COUNT);
+        camera.setZoomLevel(CAMERA_INITIAL_ZOOM_LEVEL);
         camera.zoomIn(true);
 
         panorama.setImage(plImage);
