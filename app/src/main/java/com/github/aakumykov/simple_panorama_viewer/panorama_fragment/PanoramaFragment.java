@@ -26,7 +26,13 @@ import com.panoramagl.PLManager;
 import com.panoramagl.PLSphericalPanorama;
 import com.panoramagl.utils.PLUtils;
 
+import java.util.concurrent.Callable;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Фрагмент или показывает панораму или выдаёт toast-сообщение об ошибке и закрывает сам себя.
@@ -149,14 +155,14 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
     private void processInputData() {
 
-        Uri fileUri = BundleReader.getArgument(getArguments(), FILE_URI_STRING);
+        /*Uri fileUri = BundleReader.getArgument(getArguments(), FILE_URI_STRING);
 
         if (null == fileUri)
             showErrorAndExit(new IllegalArgumentException("File uri is null"));
         else
-            displayPanorama(fileUri);
+            displayPanorama(fileUri);*/
 
-        /*final DisposableObserver<byte[]> disposableObserver =
+        final DisposableObserver<byte[]> disposableObserver =
 
                 Observable.fromCallable(new Callable<byte[]>() {
                             @Override
@@ -186,7 +192,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
                             }
                         });
 
-        mCompositeDisposable.add(disposableObserver);*/
+        mCompositeDisposable.add(disposableObserver);
     }
 
     private void displayPanorama(@NonNull Uri fileUri) {
