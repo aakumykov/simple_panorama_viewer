@@ -26,13 +26,7 @@ import com.panoramagl.PLManager;
 import com.panoramagl.PLSphericalPanorama;
 import com.panoramagl.utils.PLUtils;
 
-import java.util.concurrent.Callable;
-
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Фрагмент или показывает панораму или выдаёт toast-сообщение об ошибке и закрывает сам себя.
@@ -155,7 +149,14 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
     private void processInputData() {
 
-        final DisposableObserver<byte[]> disposableObserver =
+        Uri fileUri = BundleReader.getArgument(getArguments(), FILE_URI_STRING);
+
+        if (null == fileUri)
+            showErrorAndExit(new IllegalArgumentException("File uri is null"));
+        else
+            displayPanorama(fileUri);
+
+        /*final DisposableObserver<byte[]> disposableObserver =
 
                 Observable.fromCallable(new Callable<byte[]>() {
                             @Override
@@ -185,7 +186,23 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
                             }
                         });
 
-        mCompositeDisposable.add(disposableObserver);
+        mCompositeDisposable.add(disposableObserver);*/
+    }
+
+    private void displayPanorama(@NonNull Uri fileUri) {
+
+        PLImage plImage = new PLImage(PLUtils.getBitmap(requireContext(), fileUri));
+
+        PLSphericalPanorama panorama = new PLSphericalPanorama();
+
+        PLICamera camera = panorama.getCamera();
+        camera.setZoomLevels(CAMERA_ZOOM_LEVELS_COUNT);
+        camera.setZoomLevel(CAMERA_INITIAL_ZOOM_LEVEL);
+        camera.zoomIn(false);
+
+        panorama.setImage(plImage);
+
+        mPlManager.setPanorama(panorama);
     }
 
     private void displayPanorama(byte[] fileBytes) {
