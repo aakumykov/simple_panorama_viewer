@@ -61,6 +61,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     // Для предотвращения мерцания пользовательского интерфейса при первоначальном автоматическом
     // событии "выход из полноэкранного режима".
     private boolean mUserInterfaceWasTouchedByUser = false;
+    @Nullable private PLICamera mCamera;
 
 
     public static PanoramaFragment create(Uri fileURI) {
@@ -99,30 +100,32 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
         mPlManager.setContentView(mBinding.panoramaView);
 
         mPlManager.setListener(new PLViewListener() {
-            @Override
-            public void onTouchesBegan(@Nullable PLIView view, @Nullable List<UITouch> touches, @Nullable MotionEvent event) {
-                super.onTouchesBegan(view, touches, event);
-                Log.d(TAG, "onTouchesBegan()");
-            }
-
-            @Override
-            public void onTouchesEnded(@Nullable PLIView view, @Nullable List<UITouch> touches, @Nullable MotionEvent event) {
-                super.onTouchesEnded(view, touches, event);
-                Log.d(TAG, "onTouchesEnded()");
-            }
 
             @Override
             public void onDidBeginTouching(@Nullable PLIView view, @Nullable List<UITouch> touches, @Nullable MotionEvent event) {
                 super.onDidBeginTouching(view, touches, event);
-                mUserInterfaceController.showUserInterface(USER_INTERFACE_SHOW_HIDE_IS_DELAYED);
+
+                if (null == event)
+                    return;
+
+                if (mGestureDetectorCompat.onTouchEvent(event))
+                    mUserInterfaceController.showUserInterface(USER_INTERFACE_SHOW_HIDE_IS_DELAYED);
+                else
+                    Log.d(TAG, "onDidBeginTouching()");
             }
 
             @Override
             public void onDidEndTouching(@Nullable PLIView view, @Nullable List<UITouch> touches, @Nullable MotionEvent event) {
                 super.onDidEndTouching(view, touches, event);
-                mUserInterfaceController.hideUserInterface(USER_INTERFACE_SHOW_HIDE_IS_DELAYED);
-            }
 
+                if (null == event)
+                    return;
+
+                if (mGestureDetectorCompat.onTouchEvent(event))
+                    mUserInterfaceController.hideUserInterface(USER_INTERFACE_SHOW_HIDE_IS_DELAYED);
+                else
+                    Log.d(TAG, "onDidEndTouching()");
+            }
         });
 
         mPlManager.onCreate();
@@ -251,10 +254,10 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
         PLSphericalPanorama panorama = new PLSphericalPanorama();
 
-        PLICamera camera = panorama.getCamera();
-        camera.setZoomLevels(CAMERA_ZOOM_LEVELS_COUNT);
-        camera.setZoomLevel(CAMERA_INITIAL_ZOOM_LEVEL);
-        camera.zoomIn(false);
+        mCamera = panorama.getCamera();
+        mCamera.setZoomLevels(CAMERA_ZOOM_LEVELS_COUNT);
+        mCamera.setZoomLevel(CAMERA_INITIAL_ZOOM_LEVEL);
+        mCamera.zoomIn(false);
 
         panorama.setImage(plImage);
 
