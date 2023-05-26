@@ -21,11 +21,15 @@ import com.github.aakumykov.simple_panorama_viewer.R;
 import com.github.aakumykov.simple_panorama_viewer.databinding.FragmentPanoramaBinding;
 import com.gitlab.aakumykov.exception_utils_module.ExceptionUtils;
 import com.panoramagl.PLICamera;
+import com.panoramagl.PLIView;
 import com.panoramagl.PLImage;
 import com.panoramagl.PLManager;
 import com.panoramagl.PLSphericalPanorama;
+import com.panoramagl.PLViewListener;
+import com.panoramagl.ios.UITouch;
 import com.panoramagl.utils.PLUtils;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Observable;
@@ -44,6 +48,8 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     private static final String TAG = PanoramaFragment.class.getSimpleName();
     private static final int CAMERA_ZOOM_LEVELS_COUNT = 10;
     private static final int CAMERA_INITIAL_ZOOM_LEVEL = 8;
+    private static final boolean USER_INTERFACE_SHOW_HIDE_IS_DELAYED = true;
+    private static final int USER_INTERFACE_SHOW_HIDE_DELAY_MS = 250;
 
     private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private FragmentPanoramaBinding mBinding;
@@ -91,6 +97,34 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
         mPlManager = new PLManager(requireContext());
         mPlManager.setContentView(mBinding.panoramaView);
+
+        mPlManager.setListener(new PLViewListener() {
+            @Override
+            public void onTouchesBegan(@Nullable PLIView view, @Nullable List<UITouch> touches, @Nullable MotionEvent event) {
+                super.onTouchesBegan(view, touches, event);
+                Log.d(TAG, "onTouchesBegan()");
+            }
+
+            @Override
+            public void onTouchesEnded(@Nullable PLIView view, @Nullable List<UITouch> touches, @Nullable MotionEvent event) {
+                super.onTouchesEnded(view, touches, event);
+                Log.d(TAG, "onTouchesEnded()");
+            }
+
+            @Override
+            public void onDidBeginTouching(@Nullable PLIView view, @Nullable List<UITouch> touches, @Nullable MotionEvent event) {
+                super.onDidBeginTouching(view, touches, event);
+                mUserInterfaceController.showUserInterface(USER_INTERFACE_SHOW_HIDE_IS_DELAYED);
+            }
+
+            @Override
+            public void onDidEndTouching(@Nullable PLIView view, @Nullable List<UITouch> touches, @Nullable MotionEvent event) {
+                super.onDidEndTouching(view, touches, event);
+                mUserInterfaceController.hideUserInterface(USER_INTERFACE_SHOW_HIDE_IS_DELAYED);
+            }
+
+        });
+
         mPlManager.onCreate();
 
         mFullscreenController = new FullscreenController(requireActivity(), FullscreenController.SHOW_TRANSIENT_BARS_BY_SWIPE);
@@ -248,14 +282,9 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
 
 
     private class CustomGestureListener extends GestureDetector.SimpleOnGestureListener {
-
         @Override
         public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
             mUserInterfaceWasTouchedByUser = true;
-            /*if (mFullscreenController.isFullScreen())
-                mFullscreenController.exitFullScreen();
-            else
-                mFullscreenController.enterFullScreen();*/
             mUserInterfaceController.toggleUserInterface();
             return true;
         }
@@ -272,6 +301,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
                 showUserInterface();
         }
 
+
         private void showUserInterface() {
             showView(mBinding.openButton);
             showView(mBinding.exitButton);
@@ -286,12 +316,38 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
             mIsVisible = false;
         }
 
+
+        public void showUserInterface(boolean deferred) {
+            if (mIsVisible)
+                return;
+
+            if (deferred)
+                runWithDelay(this::showUserInterface);
+            else
+                showUserInterface();
+        }
+
+        public void hideUserInterface(boolean deferred) {
+            if (!mIsVisible)
+                return;
+
+            if (deferred)
+                runWithDelay(this::hideUserInterface);
+            else
+                hideUserInterface();
+        }
+
+
         private void showView(View view) {
             view.setVisibility(View.VISIBLE);
         }
 
         private void hideView(View view) {
             view.setVisibility(View.GONE);
+        }
+
+        private void runWithDelay(@NonNull Runnable runnable) {
+            mBinding.getRoot().postDelayed(runnable, USER_INTERFACE_SHOW_HIDE_DELAY_MS);
         }
     }
 }
