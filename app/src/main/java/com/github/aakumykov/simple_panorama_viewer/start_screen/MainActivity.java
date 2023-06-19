@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.github.aakumykov.simple_panorama_viewer.PanoramaFragmentGVR;
 import com.github.aakumykov.simple_panorama_viewer.R;
 import com.github.aakumykov.simple_panorama_viewer.databinding.ActivityMainBinding;
 import com.github.aakumykov.simple_panorama_viewer.panorama_fragment.IntentUriExtractor;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private FragmentManager mFragmentManager;
     private FragmentManager.FragmentLifecycleCallbacks mFragmentLifecycleCallbacks;
-    @Nullable private PanoramaFragment mPanoramaFragment;
+    @Nullable private PanoramaFragmentGVR mPanoramaFragmentGVR;
 
 
     @Override
@@ -95,9 +96,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (null != mPanoramaFragment)
-            return mPanoramaFragment.onTouchEvent(event);
-        else
+        /*if (null != mPanoramaFragmentGVR)
+            return mPanoramaFragmentGVR.onTouchEvent(event);
+        else*/
             return super.onTouchEvent(event);
     }
 
@@ -105,25 +106,17 @@ public class MainActivity extends AppCompatActivity {
 
         final Uri fileUri = IntentUriExtractor.getUri(intent, TAG);
 
-        Fragment newFragment;
         if (null != fileUri) {
-
-            mPanoramaFragment = PanoramaFragment.create(fileUri);
-
-            newFragment = mPanoramaFragment;
-
+            mPanoramaFragmentGVR = PanoramaFragmentGVR.Companion.create(fileUri);
             mFragmentManager
                     .beginTransaction()
-                    .replace(R.id.fragmentContainerView, mPanoramaFragment, null)
+                    .replace(R.id.fragmentContainerView, mPanoramaFragmentGVR, null)
                     .commit();
         }
         else {
-
-            newFragment = StartFragment.create();
-
             mFragmentManager
                     .beginTransaction()
-                    .replace(R.id.fragmentContainerView, newFragment, null)
+                    .replace(R.id.fragmentContainerView, StartFragment.create(), null)
                     .commit();
         }
     }

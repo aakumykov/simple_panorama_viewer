@@ -57,7 +57,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
     private boolean mUserInterfaceWasTouchedByUser = false;
 
 
-    public static PanoramaFragment create(Uri fileURI) {
+    public static PanoramaFragment create(@Nullable Uri fileURI) {
 
         PanoramaFragment panoramaFragment = new PanoramaFragment();
 
@@ -169,7 +169,7 @@ public class PanoramaFragment extends Fragment implements FullscreenController.C
                             public byte[] call() throws Exception {
                                 return FileUriBytesReader.readBytes(
                                         requireContext().getContentResolver(),
-                                        BundleReader.getArgument(getArguments(), FILE_URI_STRING));
+                                        BundleReader.getUri(getArguments(), FILE_URI_STRING));
                             }
                         })
                         .subscribeOn(Schedulers.io())

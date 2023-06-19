@@ -6,10 +6,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-class BundleReader {
+public class BundleReader {
 
     @Nullable
-    public static Uri getArgument(Bundle bundle, @NonNull String key) throws IllegalArgumentException {
+    public static Uri getUri(Bundle bundle, @NonNull String key) throws IllegalArgumentException {
 
         if (null == bundle)
             throw new IllegalArgumentException("Arguments bundle is null");
